@@ -9,11 +9,11 @@ if __name__ == '__main__':
     passwd = 'password'
 
     os.chdir(easyrsaDir)
-    #subprocess.run(['./easyrsa', 'init-pki'])
+    subprocess.run(['./easyrsa', 'init-pki'])
     child = spawn('./easyrsa build-ca')
-    child.expect('Enter*:')
+    child.expect('Enter*')
     child.sendline(passwd)
-    child.expect('Re-Enter*:')
+    child.expect('Re-Enter*')
     child.sendline(passwd)
-    child.expect('Common Name*:')
+    child.expect('Common Name*')
     child.sendline('tuimac')
