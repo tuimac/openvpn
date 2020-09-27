@@ -3,6 +3,7 @@
 VOLUME='ovpn_data'
 EXTERNALIP=`hostname -I | awk '{print $1}'`
 CLIENTNMAE='test'
+SERVERNAME='test'
 NAME='openvpn'
 
 function create(){
@@ -11,36 +12,41 @@ function create(){
         -v $VOLUME:/etc/openvpn \
         --log-driver=none \
         --name ${NAME} \
-        kylemanna/openvpn \
+        kylemanna/openvpn:2.3 \
         ovpn_genconfig -u udp://$EXTERNALIP
+    docker stop ${NAME}
 
     docker run --rm -it \
         -v $VOLUME:/etc/openvpn \
         --log-driver=none \
         --name ${NAME} \
-        kylemanna/openvpn \
+        kylemanna/openvpn:2.3 \
         ovpn_initpki
-
-    docker run -d \
-        -v $VOLUME:/etc/openvpn \
-        -p 1194:1194/udp \
-        --name ${NAME} \
-        --cap-add=NET_ADMIN \
-        kylemanna/openvpn
+    docker stop ${NAME}
 
     docker run --rm -it \
         -v $VOLUME:/etc/openvpn \
         --log-driver=none \
         --name ${NAME} \
-        kylemanna/openvpn \
+        kylemanna/openvpn:2.3 \
+        easyrsa build-server-full ${SERVERNAME} nopass
+    docker stop ${NAME}
+
+    docker run --rm -it \
+        -v $VOLUME:/etc/openvpn \
+        --log-driver=none \
+        --name ${NAME} \
+        kylemanna/openvpn:2.3 \
         easyrsa build-client-full ${CLIENTNAME} nopass
+    docker stop ${NAME}
 
     docker run --rm \
         -v $VOLUME:/etc/openvpn \
         --log-driver=none \
         --name ${NAME} \
-        kylemanna/openvpn \
+        kylemanna/openvpn:2.3 \
         ovpn_getclient ${CLIENTNAME} > ${CLIENTNAME}.ovpn
+    docker stop ${NAME}
 }
 
 function delete(){
