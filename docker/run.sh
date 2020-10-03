@@ -13,8 +13,8 @@ function runContainer(){
                 -v ${VOLUME}:/tmp \
                 -p 30000:1194 \
                 --cap-add NET_ADMIN \
+                --network=bridge \
                 -h ${NAME} \
-                --network="bridge" \
                 ${NAME}
 }
 
