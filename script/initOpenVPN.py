@@ -20,20 +20,23 @@ def initOpenVpn():
     subprocess.run(['./easyrsa', 'init-pki'])
 
 def buildCa():
+    passwd = 'password\n'
     try:
         child = spawn('./easyrsa build-ca')
-        child.expect('Enter*')
+        print(child)
+        child.delaybeforesend = 1
+        child.expect(r'^Enter .*:')
         child.sendline(passwd)
-        child.expect('Re-Enter*')
+        child.expect(r'^Re-Enter .*:')
         child.sendline(passwd)
-        child.expect('Common Name*')
+        child.expect(r'^Common Name.*')
         child.sendline('tuimac')
+        child.close()
     except Exception as e:
         raise e
 
 if __name__ == '__main__':
     easyrsaDir = '/usr/share/easy-rsa/3'
-    passwd = 'password'
 
     try:
         checkTunnelDevice()
