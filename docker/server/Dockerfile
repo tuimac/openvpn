@@ -2,6 +2,8 @@ FROM centos:latest
 
 WORKDIR /root
 
+EXPOSE 1194/udp
+
 ADD env/vimrc /etc/vimrc
 ADD env/bashrc /root/.bashrc
 ADD env/centos/vim.sh /etc/profile.d/vim.sh
