@@ -10,7 +10,7 @@ IMAGE=${DOCKERHUBUSER}/${NAME}
 
 function runContainer(){
     docker run -itd --name ${NAME} \
-                -v ${VOLUME}:/etc/openvpn \
+                -v $(pwd)/client.ovpn:/etc/openvpn/client.ovpn \
                 -h ${NAME} \
                 ${NAME}
 }
