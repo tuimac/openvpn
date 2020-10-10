@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CLIENTNAME='test'
+CLIENTNAME='node3'
 OVPN=${CLIENTNAME}'.ovpn'
 
 echo 'client
