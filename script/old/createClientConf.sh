@@ -1,6 +1,7 @@
 #!/bin/bash
 
-OVPN='client.ovpn'
+CLIENTNAME='test'
+OVPN=${CLIENTNAME}'.ovpn'
 
 echo 'client
 dev tun
@@ -26,11 +27,11 @@ cat /usr/share/easy-rsa/3/pki/ca.crt >> $OVPN
 echo '</ca>' >> $OVPN
 
 echo '<key>' >> $OVPN
-cat /usr/share/easy-rsa/3/pki/private/client.key >> $OVPN
+cat /usr/share/easy-rsa/3/pki/private/${CLIENTNAME}.key >> $OVPN
 echo '</key>' >> $OVPN
 
 echo '<cert>' >> $OVPN
-cat /usr/share/easy-rsa/3/pki/issued/client.crt >> $OVPN
+cat /usr/share/easy-rsa/3/pki/issued/${CLIENTNAME}.crt >> $OVPN
 echo '</cert>' >> $OVPN
 
 echo '<tls-auth>' >> $OVPN
