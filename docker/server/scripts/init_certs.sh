@@ -1,10 +1,10 @@
 #!/bin/bash
 
-EASYRSA='/usr/share/easy-rsa/3'
+EASYRSA='/usr/share/easy-rsa/'
 
 cd $EASYRSA
 ./easyrsa init-pki
-./easyrsa build-ca
+./easyrsa --batch build-ca nopass
 ./easyrsa gen-dh
 openvpn --genkey --secret /etc/openvpn/ta.key
 ./easyrsa build-server-full server nopass

@@ -2,6 +2,7 @@
 
 CLIENTNAME='node3'
 OVPN=${CLIENTNAME}'.ovpn'
+EASYRSA='/usr/share/easy-rsa'
 
 echo 'client
 dev tun
@@ -23,15 +24,15 @@ key-direction 1
 ' > $OVPN
 
 echo '<ca>' >> $OVPN
-cat /usr/share/easy-rsa/3/pki/ca.crt >> $OVPN
+cat ${EASYRSA}/pki/ca.crt >> $OVPN
 echo '</ca>' >> $OVPN
 
 echo '<key>' >> $OVPN
-cat /usr/share/easy-rsa/3/pki/private/${CLIENTNAME}.key >> $OVPN
+cat ${EASYRSA}/pki/private/${CLIENTNAME}.key >> $OVPN
 echo '</key>' >> $OVPN
 
 echo '<cert>' >> $OVPN
-cat /usr/share/easy-rsa/3/pki/issued/${CLIENTNAME}.crt >> $OVPN
+cat ${EASYRSA}/pki/issued/${CLIENTNAME}.crt >> $OVPN
 echo '</cert>' >> $OVPN
 
 echo '<tls-auth>' >> $OVPN

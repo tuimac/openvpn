@@ -3,7 +3,7 @@
 VIRTUALNETWORK='10.100.100.0/24'
 VIRTUALNETWORKCONF='10.100.100.0 255.255.255.0'
 ROUTING=('10.3.0.0 255.255.0.0')
-SERVERCONF='server.conf'
+SERVERCONF='/etc/openvpn/server.conf'
 
 function serverConfig(){
     echo 'port 1194
