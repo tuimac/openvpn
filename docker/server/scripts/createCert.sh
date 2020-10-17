@@ -8,4 +8,4 @@ cd $EASYRSA
 ./easyrsa gen-dh
 openvpn --genkey --secret /etc/openvpn/ta.key
 ./easyrsa build-server-full server nopass
-./easyrsa build-client-full node3 nopass
+./easyrsa build-client-full tuimac nopass

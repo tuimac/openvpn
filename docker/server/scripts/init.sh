@@ -1,27 +1,27 @@
 #!/bin/bash
 
 function createClientCert(){
-    local clientname='node3'
+    local clientname='tuimac'
     CLIENTCERT='/etc/openvpn/'${clientname}'.ovpn'
     local easyrsa='/usr/share/easy-rsa'
 
     echo 'client
-    dev tun
-    proto udp
-    remote 0.0.0.0 1194
-    resolv-retry infinite
-    nobind
-    persist-key
-    persist-tun
-    user nobody
-    group nobody
-    remote-cert-tls server
-    tls-client
-    comp-lzo
-    cipher AES-256-CBC
-    verb 4
-    tun-mtu 1500
-    key-direction 1
+dev tun
+proto udp
+remote vpn-public 30000
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+user nobody
+group nobody
+remote-cert-tls server
+tls-client
+comp-lzo
+cipher AES-256-CBC
+verb 4
+tun-mtu 1500
+key-direction 1
     ' > $CLIENTCERT
 
     echo '<ca>' >> $CLIENTCERT
@@ -42,9 +42,9 @@ function createClientCert(){
 }
 
 function serverConfig(){
-	local virtualnetworkconf='10.100.100.0 255.255.255.0'
-	local routing=('10.3.0.0 255.255.0.0')
-	local serverconf='/etc/openvpn/server.conf'
+    local virtualnetworkconf='10.100.100.0 255.255.255.0'
+    local routing=('10.3.0.0 255.255.0.0')
+    local serverconf='/etc/openvpn/server.conf'
     
     echo 'port 1194
 proto udp
@@ -69,12 +69,12 @@ verb 4
 explicit-exit-notify 1' > $serverconf
     echo 'server '${virtualnetworkconf} >> $serverconf
     for((i=0; i < ${#routing[@]}; i++)); do
-        echo 'push "'${routing[$i]}'"' >> $serverconf
+        echo 'push "route '${routing[$i]}'"' >> $serverconf
     done
 }
 
 function startVPN(){
-	local virtualnetwork='10.100.100.0/24'
+    local virtualnetwork='10.100.100.0/24'
     
     mkdir /dev/net
     mknod /dev/net/tun c 10 200
