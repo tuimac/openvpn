@@ -80,7 +80,8 @@ function startVPN(){
     mknod /dev/net/tun c 10 200
     which iptables > /dev/null 2>&1
     [[ $? -ne 0 ]] && { apk add iptables; }
-    iptables -t nat -A POSTROUTING -s $virtualnetwork -o tun0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s $virtualnetwork -o eth0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s 10.3.0.0/16 -o eth0 -j MASQUERADE
     exec openvpn --config /etc/openvpn/server.conf
 }
 
