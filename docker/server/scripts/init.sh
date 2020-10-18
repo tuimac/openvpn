@@ -1,10 +1,34 @@
 #!/bin/bash
 
-function createClientCert(){
-    local clientname='tuimac'
-    CLIENTCERT='/etc/openvpn/'${clientname}'.ovpn'
-    local easyrsa='/usr/share/easy-rsa'
+CLIENTCERTNAME='tuimac'
+CLIENTCERTPATH='/etc/openvpn/'${CLIENTCERTNAME}'.ovpn'
+EASYRSA='/usr/share/easy-rsa'
+VIRTUALNETWORK='10.150.100.0/24'
+ROUTINGS=('10.3.0.0/16')
+SERVERCONF='/etc/openvpn/server.conf'
 
+function convertNetmask(){
+    local network=${1}
+    local index=0
+    RESULT=''
+
+    for x in ${network//// }; do
+        [[ $index -eq 0 ]] && { RESULT=$x' '; }
+        [[ $index -eq 1 ]] && { SUBNET=$x; }
+        ((index++))
+    done
+    local subnetmask=''
+    for((i=0; i < $((SUBNET / 8)); i++)); do
+        subnetmask+='255.'
+    done
+    subnetmask+=$((256 - ( 1 << (8 - (SUBNET % 8)))))
+    for((i=0; i < $((3 - (SUBNET / 8))); i++)); do
+        subnetmask=${subnetmask}'.0'
+    done
+    RESULT+=$subnetmask
+}
+
+function createClientCert(){
     echo 'client
 dev tun
 proto udp
@@ -22,30 +46,26 @@ cipher AES-256-CBC
 verb 4
 tun-mtu 1500
 key-direction 1
-    ' > $CLIENTCERT
+    ' > $CLIENTCERTPATH
 
-    echo '<ca>' >> $CLIENTCERT
-    cat ${easyrsa}/pki/ca.crt >> $CLIENTCERT
-    echo '</ca>' >> $CLIENTCERT
+    echo '<ca>' >> $CLIENTCERTPATH
+    cat ${EASYRSA}/pki/ca.crt >> $CLIENTCERTPATH
+    echo '</ca>' >> $CLIENTCERTPATH
 
-    echo '<key>' >> $CLIENTCERT
-    cat ${easyrsa}/pki/private/${clientname}.key >> $CLIENTCERT
-    echo '</key>' >> $CLIENTCERT
+    echo '<key>' >> $CLIENTCERTPATH
+    cat ${EASYRSA}/pki/private/${CLIENTCERTNAME}.key >> $CLIENTCERTPATH
+    echo '</key>' >> $CLIENTCERTPATH
 
-    echo '<cert>' >> $CLIENTCERT
-    cat ${easyrsa}/pki/issued/${clientname}.crt >> $CLIENTCERT
-    echo '</cert>' >> $CLIENTCERT
+    echo '<cert>' >> $CLIENTCERTPATH
+    cat ${EASYRSA}/pki/issued/${CLIENTCERTNAME}.crt >> $CLIENTCERTPATH
+    echo '</cert>' >> $CLIENTCERTPATH
 
-    echo '<tls-auth>' >> $CLIENTCERT
-    cat /etc/openvpn/ta.key >> $CLIENTCERT
-    echo '</tls-auth>' >> $CLIENTCERT
+    echo '<tls-auth>' >> $CLIENTCERTPATH
+    cat /etc/openvpn/ta.key >> $CLIENTCERTPATH
+    echo '</tls-auth>' >> $CLIENTCERTPATH
 }
 
 function serverConfig(){
-    local virtualnetworkconf='10.100.100.0 255.255.255.0'
-    local routing=('10.3.0.0 255.255.0.0')
-    local serverconf='/etc/openvpn/server.conf'
-    
     echo 'port 1194
 proto udp
 dev tun
@@ -66,22 +86,22 @@ status /var/log/openvpn-status.log
 log         /var/log/openvpn.log
 log-append  /var/log/openvpn.log
 verb 4
-explicit-exit-notify 1' > $serverconf
-    echo 'server '${virtualnetworkconf} >> $serverconf
-    for((i=0; i < ${#routing[@]}; i++)); do
-        echo 'push "route '${routing[$i]}'"' >> $serverconf
+explicit-exit-notify 1' > $SERVERCONF
+    convertNetmask $VIRTUALNETWORK
+    echo 'server '${RESULT} >> $SERVERCONF
+    for((i=0; i < ${#ROUTINGS[@]}; i++)); do
+        convertNetmask ${ROUTINGS[$i]}
+        echo 'push "route '${RESULT}'"' >> $SERVERCONF
     done
 }
 
 function startVPN(){
-    local virtualnetwork='10.100.100.0/24'
-    
     mkdir /dev/net
     mknod /dev/net/tun c 10 200
-    which iptables > /dev/null 2>&1
-    [[ $? -ne 0 ]] && { apk add iptables; }
-    iptables -t nat -A POSTROUTING -s $virtualnetwork -o eth0 -j MASQUERADE
-    iptables -t nat -A POSTROUTING -s 10.3.0.0/16 -o eth0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s $VIRTUALNETWORK -o eth0 -j MASQUERADE
+    for route in ${ROUTINGS[@]}; do
+        iptables -t nat -A POSTROUTING -s $route -o eth0 -j MASQUERADE
+    done
     exec openvpn --config /etc/openvpn/server.conf
 }
 
