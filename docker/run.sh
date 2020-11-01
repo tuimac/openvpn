@@ -10,13 +10,14 @@ IMAGE=${DOCKERHUBUSER}/${NAME}
 
 function runContainer(){
     docker run -itd --name ${NAME} \
-                -v ${VOLUME}:/tmp \
-                -p 30000:1194/udp \
-                -p 30000:1194/tcp \
-                --cap-add NET_ADMIN \
-                --network=bridge \
-                -h ${NAME} \
-                ${NAME}
+        -v ${VOLUME}:/tmp \
+        -p 30000:1194/udp \
+        -p 30000:1194/tcp \
+        --cap-add NET_ADMIN \
+        --env-file env.list \
+        --network=bridge \
+        -h ${NAME} \
+        ${NAME}
 }
 
 function cleanup(){
