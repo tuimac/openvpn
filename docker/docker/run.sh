@@ -12,6 +12,7 @@ function runContainer(){
     docker run -itd --name ${NAME} \
                 -v ${VOLUME}:/tmp \
                 -p 30000:1194/udp \
+                -p 30000:1194/tcp \
                 --cap-add NET_ADMIN \
                 --network=bridge \
                 -h ${NAME} \

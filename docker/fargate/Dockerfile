@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-EXPOSE 1194
+EXPOSE 1194/udp
 
 RUN apk add openvpn bash easy-rsa
 ADD init.sh /etc/openvpn/init.sh

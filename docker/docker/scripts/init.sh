@@ -3,19 +3,11 @@
 CLIENTCERTNAME='tuimac'
 CLIENTCERTPATH='/etc/openvpn/'${CLIENTCERTNAME}'.ovpn'
 EASYRSA='/usr/share/easy-rsa'
+EXTERNALPORT=30000
+INTERNALPORT=1194
 VIRTUALNETWORK='10.150.100.0/24'
 ROUTINGS=('10.3.0.0/16')
 SERVERCONF='/etc/openvpn/server.conf'
-
-function createCert(){
-	cd $EASYRSA
-	./easyrsa init-pki
-	./easyrsa --batch build-ca nopass
-	./easyrsa gen-dh
-	openvpn --genkey --secret /etc/openvpn/ta.key
-	./easyrsa build-server-full server nopass
-	./easyrsa build-client-full tuimac nopass
-}
 
 function convertNetmask(){
     local network=${1}
@@ -39,10 +31,11 @@ function convertNetmask(){
 }
 
 function createClientCert(){
-    echo 'client
+    cat <<EOF > $CLIENTCERTPATH
+client
 dev tun
 proto udp
-remote vpn-public 30000
+remote vpn-public $PORT
 resolv-retry infinite
 nobind
 persist-key
@@ -56,7 +49,7 @@ cipher AES-256-CBC
 verb 4
 tun-mtu 1500
 key-direction 1
-    ' > $CLIENTCERTPATH
+EOF
 
     echo '<ca>' >> $CLIENTCERTPATH
     cat ${EASYRSA}/pki/ca.crt >> $CLIENTCERTPATH
@@ -75,8 +68,13 @@ key-direction 1
     echo '</tls-auth>' >> $CLIENTCERTPATH
 }
 
+function downloadPem(){
+    python3 /etc/openvpn/pem.py $CLIENTCERTPATH $INTERNALPORT
+}
+
 function serverConfig(){
-    echo 'port 1194
+    cat <<EOF > $SERVERCONF
+port ${INTERNALPORT}
 proto udp
 dev tun
 ca /usr/share/easy-rsa/pki/ca.crt
@@ -96,7 +94,8 @@ status /var/log/openvpn-status.log
 log         /var/log/openvpn.log
 log-append  /var/log/openvpn.log
 verb 4
-explicit-exit-notify 1' > $SERVERCONF
+explicit-exit-notify 1
+EOF
     convertNetmask $VIRTUALNETWORK
     echo 'server '${RESULT} >> $SERVERCONF
     for((i=0; i < ${#ROUTINGS[@]}; i++)); do
@@ -116,9 +115,9 @@ function startVPN(){
 }
 
 function main(){
-    createCert
     serverConfig
     createClientCert
+    downloadPem
     startVPN
 }
 
