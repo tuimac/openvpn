@@ -7,6 +7,16 @@ VIRTUALNETWORK='10.150.100.0/24'
 ROUTINGS=('10.3.0.0/16')
 SERVERCONF='/etc/openvpn/server.conf'
 
+function generateCert(){
+	cd $EASYRSA
+	./easyrsa init-pki
+	./easyrsa --batch build-ca nopass
+	./easyrsa gen-dh
+	openvpn --genkey --secret /etc/openvpn/ta.key
+	./easyrsa build-server-full server nopass
+	./easyrsa build-client-full tuimac nopass
+}
+
 function convertNetmask(){
     local network=${1}
     local index=0
@@ -106,6 +116,7 @@ function startVPN(){
 }
 
 function main(){
+    generateCert
     serverConfig
     createClientCert
     startVPN

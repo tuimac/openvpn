@@ -27,7 +27,7 @@ function createContainer(){
     mkdir ${VOLUME}
     docker build -t ${NAME} .
     runContainer
-    cleanup
+    #cleanup
 }
 
 function rerunContainer(){
