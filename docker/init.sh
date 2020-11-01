@@ -3,11 +3,22 @@
 CLIENTCERTNAME='tuimac'
 CLIENTCERTPATH='/etc/openvpn/'${CLIENTCERTNAME}'.ovpn'
 EASYRSA='/usr/share/easy-rsa'
+SERVERCONF='/etc/openvpn/server.conf'
 EXTERNALPORT=30000
 INTERNALPORT=1194
-VIRTUALNETWORK='10.150.100.0/24'
-ROUTINGS=('10.3.0.0/16')
-SERVERCONF='/etc/openvpn/server.conf'
+PUBLICIP='publicip'
+VIRTUALNETWORK='10.8.0.0/24'
+ROUTINGS=('192.168.0.0/16' '10.0.0.0/16')
+
+function generateCert(){
+	cd $EASYRSA
+	./easyrsa init-pki
+	./easyrsa --batch build-ca nopass
+	./easyrsa gen-dh
+	openvpn --genkey --secret /etc/openvpn/ta.key
+	./easyrsa build-server-full server nopass
+	./easyrsa build-client-full tuimac nopass
+}
 
 function convertNetmask(){
     local network=${1}
@@ -35,7 +46,7 @@ function createClientCert(){
 client
 dev tun
 proto udp
-remote vpn-public $PORT
+remote $PUBLICIP $EXTERNALPORT
 resolv-retry infinite
 nobind
 persist-key
@@ -115,6 +126,7 @@ function startVPN(){
 }
 
 function main(){
+    generateCert
     serverConfig
     createClientCert
     downloadPem
