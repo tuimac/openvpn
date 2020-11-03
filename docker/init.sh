@@ -1,23 +1,23 @@
 #!/bin/bash
 
-CLIENTCERTNAME='tuimac'
+#CLIENTCERTNAME='tuimac'
 CLIENTCERTPATH='/etc/openvpn/'${CLIENTCERTNAME}'.ovpn'
 EASYRSA='/usr/share/easy-rsa'
 SERVERCONF='/etc/openvpn/server.conf'
-EXTERNALPORT=30000
-INTERNALPORT=1194
-PUBLICIP='publicip'
-VIRTUALNETWORK='10.8.0.0/24'
-ROUTINGS=('192.168.0.0/16' '10.0.0.0/16')
+#EXTERNALPORT=30000
+#INTERNALPORT=1194
+#PUBLICIP='publicip'
+#VIRTUALNETWORK='10.8.0.0/24'
+#ROUTINGS=('192.168.0.0/16' '10.0.0.0/16')
 
 function generateCert(){
-	cd $EASYRSA
-	./easyrsa init-pki
-	./easyrsa --batch build-ca nopass
-	./easyrsa gen-dh
-	openvpn --genkey --secret /etc/openvpn/ta.key
-	./easyrsa build-server-full server nopass
-	./easyrsa build-client-full tuimac nopass
+    cd $EASYRSA
+    ./easyrsa init-pki
+    ./easyrsa --batch build-ca nopass
+    ./easyrsa gen-dh
+    openvpn --genkey --secret /etc/openvpn/ta.key
+    ./easyrsa build-server-full server nopass
+    ./easyrsa build-client-full tuimac nopass
 }
 
 function convertNetmask(){
@@ -119,8 +119,15 @@ function startVPN(){
     mkdir /dev/net
     mknod /dev/net/tun c 10 200
     iptables -t nat -A POSTROUTING -s $VIRTUALNETWORK -o eth0 -j MASQUERADE
-    for route in ${ROUTINGS[@]}; do
-        iptables -t nat -A POSTROUTING -s $route -o eth0 -j MASQUERADE
+    env | grep -E 'ROUTING[[:digit:]]' | while read line; do
+            local index=0
+            for part in ${line//=/ }; do
+                    if [ $index -eq 1 ]; then
+                            iptables -t nat -A POSTROUTING -s $part -o eth0 -j MASQUERADE
+                            break
+                    fi
+                    ((index++))
+            done
     done
     exec openvpn --config /etc/openvpn/server.conf
 }
