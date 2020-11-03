@@ -1,14 +1,9 @@
 #!/bin/bash
 
-#CLIENTCERTNAME='tuimac'
 CLIENTCERTPATH='/etc/openvpn/'${CLIENTCERTNAME}'.ovpn'
 EASYRSA='/usr/share/easy-rsa'
 SERVERCONF='/etc/openvpn/server.conf'
-#EXTERNALPORT=30000
-#INTERNALPORT=1194
-#PUBLICIP='publicip'
-#VIRTUALNETWORK='10.8.0.0/24'
-#ROUTINGS=('192.168.0.0/16' '10.0.0.0/16')
+INITFLAG='/etc/openvpn/.initflag'
 
 function generateCert(){
     cd $EASYRSA
@@ -109,9 +104,15 @@ explicit-exit-notify 1
 EOF
     convertNetmask $VIRTUALNETWORK
     echo 'server '${RESULT} >> $SERVERCONF
-    for((i=0; i < ${#ROUTINGS[@]}; i++)); do
-        convertNetmask ${ROUTINGS[$i]}
-        echo 'push "route '${RESULT}'"' >> $SERVERCONF
+    env | grep -E 'ROUTING[[:digit:]]' | while read line; do
+        local index=0
+        for part in ${line//=/ }; do
+            if [ $index -eq 1 ]; then
+                convertNetmask $part
+                echo 'push "route '${RESULT}'"' >> $SERVERCONF
+            fi
+            ((index++))
+        done
     done
 }
 
@@ -120,24 +121,34 @@ function startVPN(){
     mknod /dev/net/tun c 10 200
     iptables -t nat -A POSTROUTING -s $VIRTUALNETWORK -o eth0 -j MASQUERADE
     env | grep -E 'ROUTING[[:digit:]]' | while read line; do
-            local index=0
-            for part in ${line//=/ }; do
-                    if [ $index -eq 1 ]; then
-                            iptables -t nat -A POSTROUTING -s $part -o eth0 -j MASQUERADE
-                            break
-                    fi
-                    ((index++))
-            done
+        local index=0
+        for part in ${line//=/ }; do
+            if [ $index -eq 1 ]; then
+                iptables -t nat -A POSTROUTING -s $part -o eth0 -j MASQUERADE
+                break
+            fi
+            ((index++))
+        done
     done
     exec openvpn --config /etc/openvpn/server.conf
 }
 
 function main(){
-    generateCert
-    serverConfig
-    createClientCert
-    downloadPem
+    if [[ ! -e $INITFLAG ]]; then
+        touch $INITFLAG
+        generateCert
+        serverConfig
+        createClientCert
+        downloadPem
+    else
+        echo 'Installation of OpenVPN already done.'
+    fi
     startVPN
+    if [ $? -eq 0 ]; then
+        echo 'Starting OpenVPN process has been sucessed.'
+    else
+        echo 'Starting OpenVPN process has been failed.'
+    fi
 }
 
 main
