@@ -1,0 +1,61 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: openvpn
+  name: openvpn 
+spec:
+  type: NodePort
+  ports:
+    - name: pem
+      protocol: TCP
+      nodePort: 30000
+      port: 30000
+      targetPort: 1194
+    - name: openvpn
+      protocol: UDP
+      nodePort: 30000
+      port: 30000
+      targetPort: 1194
+  selector:
+    app: openvpn
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openvpn-deployment
+  labels:
+    app: openvpn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openvpn
+  template:
+    metadata:
+      labels:
+        app: openvpn
+    spec:
+      containers:
+        - name: openvpn
+          image: tuimac/openvpn:latest
+          ports:
+            - containerPort: 1194
+          env:
+            - name: CLIENTCERTNAME
+              value: tuimac
+            - name: EXTERNALPORT
+              value: 30000
+            - name: INTERNALPORT
+              value: 1194
+            - name: PUBLICIP
+              value: 18.181.173.93
+            - name: VIRTUALNETWORK
+              value: 10.8.0.0/24
+            - name: ROUTING1
+              value: 192.166.0.0/16
+            - name: ROUTING2
+              value: 10.3.0.0/16
+
