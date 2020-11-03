@@ -2,7 +2,7 @@
 
 # Change variables below if you need
 ##############################
-NAME="openvpn"
+NAME="openvpn-test"
 VOLUME="${PWD}/volume"
 DOCKERHUBUSER="tuimac"
 IMAGE=${DOCKERHUBUSER}/${NAME}
@@ -11,8 +11,8 @@ IMAGE=${DOCKERHUBUSER}/${NAME}
 function runContainer(){
     docker run -itd --name ${NAME} \
         -v ${VOLUME}:/tmp \
-        -p 30000:1194/udp \
-        -p 30000:1194/tcp \
+        -p 30001:1194/udp \
+        -p 30001:1194/tcp \
         --cap-add NET_ADMIN \
         --env-file env.list \
         --network=bridge \

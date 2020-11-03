@@ -1,5 +1,5 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   labels:
     app: openvpn
@@ -18,44 +18,44 @@ spec:
       port: 30000
       targetPort: 1194
   selector:
-    app: openvpn
+    app: openvpn-pod
 
 ---
 
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: openvpn-deployment
+  name: openvpn
   labels:
-    app: openvpn
+    app: openvpn-pod
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: openvpn
-  template:
-    metadata:
-      labels:
-        app: openvpn
-    spec:
-      containers:
+  containers:
+    - name: openvpn
+      image: tuimac/openvpn:latest
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        capabilities:
+          add:
+            - "NET_ADMIN"
+      ports:
+        - name: pem
+          protocol: TCP
+          containerPort: 1194
         - name: openvpn
-          image: tuimac/openvpn:latest
-          ports:
-            - containerPort: 1194
-          env:
-            - name: CLIENTCERTNAME
-              value: tuimac
-            - name: EXTERNALPORT
-              value: 30000
-            - name: INTERNALPORT
-              value: 1194
-            - name: PUBLICIP
-              value: 18.181.173.93
-            - name: VIRTUALNETWORK
-              value: 10.8.0.0/24
-            - name: ROUTING1
-              value: 192.166.0.0/16
-            - name: ROUTING2
-              value: 10.3.0.0/16
-
+          protocol: UDP
+          containerPort: 1194
+      env:
+        - name: CLIENTCERTNAME
+          value: 'tuimac'
+        - name: EXTERNALPORT
+          value: '30000'
+        - name: INTERNALPORT
+          value: '1194'
+        - name: PUBLICIP
+          value: '18.181.173.93'
+        - name: VIRTUALNETWORK
+          value: '10.8.0.0/24'
+        - name: ROUTING1
+          value: '10.230.0.0/16'
+        - name: ROUTING2
+          value: '10.3.0.0/16'
