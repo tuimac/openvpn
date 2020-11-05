@@ -52,7 +52,7 @@ spec:
         - name: INTERNALPORT
           value: '1194'
         - name: PUBLICIP
-          value: '18.181.173.93'
+          value: 'vpn-public'
         - name: VIRTUALNETWORK
           value: '10.8.0.0/24'
         - name: ROUTING1
