@@ -6,19 +6,30 @@ services:
 env:
   global:
     - NAME=openvpn
-    - IMAGE=tuimac/openvpn
     - PORT=30001
-before_script: cd images/x64
 jobs:
   include:
-    - stage: 'Run docker container'
+    - stage: 'Run docker container for x64'
       name: 'Run openvpn container'
+      before_script: cd images
+      env:
+        - NAME=tuimac/openvpn
       script:
-        - docker build -t ${IMAGE} . || travis_terminate 1;
+        - docker build -t ${IMAGE} -f Dockerfile-x64 || travis_terminate 1;
         - docker volume create ${NAME} || travis_terminate 1;
         - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list -h ${NAME} --network=bridge ${IMAGE} || travis_terminate 1;
         - sleep 3 || travis_terminate 1;
         - for i in {0..4}; do curl http://localhost:${PORT}; sleep 10; done || travis_terminate 1;
+      after_success:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
+        - docker push ${IMAGE} || travis_terminate 1;
+    - stage: 'Just build image for aarch64'
+      name: 'Build image'
+      before_script: cd images
+      env:
+        - NAME=openvpn-aarch64
+      script:
+        - docker build -t ${IMAGE} -f Dockerfile-aarch64 || travis_terminate 1;
       after_success:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
         - docker push ${IMAGE} || travis_terminate 1;
