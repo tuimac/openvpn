@@ -5,7 +5,7 @@ services:
 
 env:
   global:
-    - NAME=openvpn
+    - NAME=tuimac/openvpn
     - PORT=30001
 
 before_script: cd images/x64
@@ -20,7 +20,8 @@ jobs:
         - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PDRT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${NAME}
         - sleep 1
         - "[[ ! -z $(docker ps -a | grep Exited) ]] && { echo 'Start container had been failed!!'; exit 1; }"
+        - "for i in {0..4}; do curl http://localhost:${PORT}; sleep 10; done"
+        - "[[ $? -ne 0 ]] && { echo 'failure!!'; exit 1; }"
       after_success:
-        - for i in {0..4}; do curl http://localhost:${PORT}; sleep 10; done
-      script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push ${NAME} 
