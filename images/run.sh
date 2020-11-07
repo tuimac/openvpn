@@ -29,7 +29,7 @@ function cleanup(){
 
 function createContainer(){
     mkdir ${VOLUME}
-    docker build -t ${NAME} .
+    docker build -t ${NAME} -f Dockerfile-x64 .
     runContainer
     #cleanup
 }
