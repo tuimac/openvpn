@@ -2,7 +2,7 @@
 
 # Change variables below if you need
 ##############################
-NAME="openvpn-test"
+NAME="openvpn"
 VOLUME="${PWD}/volume"
 DOCKERHUBUSER="tuimac"
 IMAGE=${DOCKERHUBUSER}/${NAME}
