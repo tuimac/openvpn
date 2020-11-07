@@ -24,7 +24,7 @@ jobs:
         - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PDRT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${NAME}
       after_success:
         - sleep 1
-        - [[ ! -z $(docker ps -a | grep Exited) ]] && { echo 'Start container had been failed!!'; exit 1; }
+        - "[[ ! -z $(docker ps -a | grep Exited) ]] && { echo 'Start container had been failed!!'; exit 1; }"
     - stage: 'Integration test'
       name: 'Download ovpn file.'
       script:
