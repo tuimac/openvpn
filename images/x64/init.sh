@@ -156,7 +156,7 @@ function main(){
     else
         echo 'Installation of OpenVPN already done.'
     fi
-    #startVPN
+    startVPN
     if [ $? -eq 0 ]; then
         echo 'Starting OpenVPN process has been sucessed.'
     else
