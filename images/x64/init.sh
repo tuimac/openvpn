@@ -97,8 +97,8 @@ port ${INTERNALPORT}
 proto udp
 dev tun
 ca ${SERVERDIR}/ca.crt
-cert ${SERVERDIR}/server.crt
-key ${SERVERDIR}/server.key
+cert ${SERVERDIR}/${SERVERCERTNAME}.crt
+key ${SERVERDIR}/${SERVERCERTNAME}.key
 dh ${SERVERDIR}/dh.pem
 keepalive 10 120
 tls-auth ${SERVERDIR}/ta.key 0
@@ -156,7 +156,7 @@ function main(){
     else
         echo 'Installation of OpenVPN already done.'
     fi
-    startVPN
+    #startVPN
     if [ $? -eq 0 ]; then
         echo 'Starting OpenVPN process has been sucessed.'
     else
