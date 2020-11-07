@@ -12,26 +12,15 @@ before_script: cd images/x64
 
 jobs:
   include:
-    - stage: 'Build docker image'
-      name: 'Build test'
+    - stage: 'Run docker container'
+      name: 'Run openvpn container'
       script:
         - docker build -t ${NAME} .
-    - stage: 'Create volume'
-      name: 'Just create volume'
-      script:
         - docker volume create ${NAME}
-    - stage: 'Start docker containre'
-      name: 'Test for starging container'
-      script:
         - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PDRT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${NAME}
-      after_success:
         - sleep 1
         - "[[ ! -z $(docker ps -a | grep Exited) ]] && { echo 'Start container had been failed!!'; exit 1; }"
-    - stage: 'Integration test'
-      name: 'Download ovpn file.'
-      script:
+      after_success:
         - for i in {0..4}; do curl http://localhost:${PORT}; sleep 10; done
-    - stage: 'Push image'
-      name: 'Publish docker image to Docker HUB'
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
