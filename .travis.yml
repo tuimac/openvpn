@@ -5,7 +5,8 @@ services:
 
 env:
   global:
-    - NAME=tuimac/openvpn
+    - NAME=openvpn
+    - IMAGE=tuimac/openvpn
     - PORT=30001
 
 before_script: cd images/x64
@@ -15,13 +16,13 @@ jobs:
     - stage: 'Run docker container'
       name: 'Run openvpn container'
       script:
-        - docker build -t ${NAME} .
-        - docker volume create ${NAME}
-        - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PDRT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${NAME}
-        - sleep 1
-        - "[[ ! -z $(docker ps -a | grep Exited) ]] && { echo 'Start container had been failed!!'; exit 1; }"
-        - "for i in {0..4}; do curl http://localhost:${PORT}; sleep 10; done"
-        - "[[ $? -ne 0 ]] && { echo 'failure!!'; exit 1; }"
+        - docker build -t ${IMAGE} . || travis_terminate 1;
+        - docker volume create ${NAME} || travis_terminate 1;
+        - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PDRT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${IMAGE} || travis_terminate 1;
+        - sleep 1 || travis_terminate 1;
+        - "[[ ! -z $(docker ps -a | grep Exited) ]] && { echo 'Start container had been failed!!'; exit 1; }" || travis_terminate 1;
+        - "for i in {0..4}; do curl http://localhost:${PORT}; sleep 10; done" || travis_terminate 1;
+        - "[[ $? -ne 0 ]] && { echo 'failure!!'; exit 1; }" || travis_terminate 1;
       after_success:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker push ${NAME} 
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
+        - docker push ${IMAGE} || travis_terminate 1;
