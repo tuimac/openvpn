@@ -8,6 +8,8 @@ env:
     - NAME=openvpn
     - PORT=30001
 
+before_script: cd images/x64
+
 jobs:
   include:
     - stage: 'Build docker image'
