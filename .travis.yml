@@ -15,7 +15,7 @@ jobs:
       env:
         - NAME=tuimac/openvpn
       script:
-        - docker build -t ${IMAGE} -f Dockerfile-x64 || travis_terminate 1;
+        - docker build -t ${IMAGE} -f Dockerfile-x64 . || travis_terminate 1;
         - docker volume create ${NAME} || travis_terminate 1;
         - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list -h ${NAME} --network=bridge ${IMAGE} || travis_terminate 1;
         - sleep 3 || travis_terminate 1;
@@ -29,7 +29,7 @@ jobs:
       env:
         - NAME=openvpn-aarch64
       script:
-        - docker build -t ${IMAGE} -f Dockerfile-aarch64 || travis_terminate 1;
+        - docker build -t ${IMAGE} -f Dockerfile-aarch64 . || travis_terminate 1;
       after_success:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
         - docker push ${IMAGE} || travis_terminate 1;
