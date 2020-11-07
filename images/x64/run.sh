@@ -31,7 +31,7 @@ function createContainer(){
     mkdir ${VOLUME}
     docker build -t ${NAME} .
     runContainer
-    cleanup
+    #cleanup
 }
 
 function rerunContainer(){
@@ -52,7 +52,7 @@ function deleteAll(){
     docker rmi ${NAME}
     docker volume rm ${NAME}
     cleanup
-    rm -rf ${VOLUME}
+    sudo rm -rf ${VOLUME}
 }
 
 function commitImage(){

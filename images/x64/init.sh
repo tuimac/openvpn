@@ -2,17 +2,30 @@
 
 CLIENTCERTPATH='/etc/openvpn/'${CLIENTCERTNAME}'.ovpn'
 EASYRSA='/usr/share/easy-rsa'
-SERVERCONF='/etc/openvpn/server.conf'
-INITFLAG='/etc/openvpn/.initflag'
+BASEDIR='/etc/openvpn'
+SERVERCONF=${BASEDIR}'/server.conf'
+INITFLAG=${BASEDIR}'/.initflag'
+CLIENTDIR=${BASEDIR}'/cert/client/'${CLIENTCERTNAME}
+SERVERDIR=${BASEDIR}'/cert/server'
+SERVERCERTNAME=${RANDOM}
 
 function generateCert(){
+    mkdir -p ${SERVERDIR}
+    mkdir -p ${CLIENTDIR}
     cd $EASYRSA
     ./easyrsa init-pki
     ./easyrsa --batch build-ca nopass
     ./easyrsa gen-dh
-    openvpn --genkey --secret /etc/openvpn/ta.key
-    ./easyrsa build-server-full server nopass
-    ./easyrsa build-client-full tuimac nopass
+    openvpn --genkey --secret ${EASYRSA}/pki/ta.key
+    ./easyrsa build-server-full ${SERVERCERTNAME} nopass
+    ./easyrsa build-client-full ${CLIENTCERTNAME} nopass
+    mv ${EASYRSA}/pki/ca.crt ${SERVERDIR}
+    mv ${EASYRSA}/pki/issued/${SERVERCERTNAME}.key ${SERVERDIR}
+    mv ${EASYRSA}/pki/private/${SERVERCERTNAME}.cert ${SERVERDIR}
+    mv ${EASYRSA}/pki/ta.key ${SERVERDIR}
+    mv ${EASYRSA}/pki/dh.pem ${SERVERDIR}
+    mv ${EASYRSA}/pki/issued/${CLIENTCERTNAME}.key ${CLIENTDIR}
+    mv ${EASYRSA}/pki/private/${CLIENTCERTNAME}.cert ${CLIENTDIR}
 }
 
 function convertNetmask(){
@@ -58,19 +71,19 @@ key-direction 1
 EOF
 
     echo '<ca>' >> $CLIENTCERTPATH
-    cat ${EASYRSA}/pki/ca.crt >> $CLIENTCERTPATH
+    cat ${SERVERDIR}/ca.crt >> $CLIENTCERTPATH
     echo '</ca>' >> $CLIENTCERTPATH
 
     echo '<key>' >> $CLIENTCERTPATH
-    cat ${EASYRSA}/pki/private/${CLIENTCERTNAME}.key >> $CLIENTCERTPATH
+    cat ${CLIENTDIR}/${CLIENTCERTNAME}.key >> $CLIENTCERTPATH
     echo '</key>' >> $CLIENTCERTPATH
 
     echo '<cert>' >> $CLIENTCERTPATH
-    cat ${EASYRSA}/pki/issued/${CLIENTCERTNAME}.crt >> $CLIENTCERTPATH
+    cat ${CLIENTDIR}/${CLIENTCERTNAME}.crt >> $CLIENTCERTPATH
     echo '</cert>' >> $CLIENTCERTPATH
 
     echo '<tls-auth>' >> $CLIENTCERTPATH
-    cat /etc/openvpn/ta.key >> $CLIENTCERTPATH
+    cat ${SERVERDIR}/ta.key >> $CLIENTCERTPATH
     echo '</tls-auth>' >> $CLIENTCERTPATH
 }
 
@@ -83,12 +96,12 @@ function serverConfig(){
 port ${INTERNALPORT}
 proto udp
 dev tun
-ca /usr/share/easy-rsa/pki/ca.crt
-cert /usr/share/easy-rsa/pki/issued/server.crt
-key /usr/share/easy-rsa/pki/private/server.key
-dh /usr/share/easy-rsa/pki/dh.pem
+ca ${SERVERDIR}/ca.crt
+cert ${SERVERDIR}/server.crt
+key ${SERVERDIR}/server.key
+dh ${SERVERDIR}/dh.pem
 keepalive 10 120
-tls-auth /etc/openvpn/ta.key 0 # This file is secret
+tls-auth ${SERVERDIR}/ta.key 0
 cipher AES-256-CBC
 comp-lzo
 max-clients 1
@@ -130,7 +143,7 @@ function startVPN(){
             ((index++))
         done
     done
-    exec openvpn --config /etc/openvpn/server.conf
+    exec openvpn --config ${BASEDIR}/server.conf
 }
 
 function main(){
