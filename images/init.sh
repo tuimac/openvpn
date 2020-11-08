@@ -2,7 +2,7 @@
 
 CLIENTCERTPATH='/etc/openvpn/'${CLIENTCERTNAME}'.ovpn'
 EASYRSA='/usr/share/easy-rsa'
-BASEDIR='/etc/openvpn'
+BASEDIR='/etc/openvpn/data'
 SERVERCONF=${BASEDIR}'/server.conf'
 INITFLAG=${BASEDIR}'/.initflag'
 CLIENTDIR=${BASEDIR}'/cert/client/'${CLIENTCERTNAME}
@@ -147,6 +147,7 @@ function startVPN(){
 }
 
 function main(){
+    sleep 1
     if [[ ! -e $INITFLAG ]]; then
         touch $INITFLAG
         generateCert

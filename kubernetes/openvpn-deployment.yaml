@@ -59,3 +59,10 @@ spec:
           value: '10.230.0.0/16'
         - name: ROUTING2
           value: '10.3.0.0/16'
+      volumeMounts:
+        - mountPath: /etc/openvpn/data
+          name: openvpn-persistent-volume
+  volumes:
+    - name: openvpn-persistent-volume
+      persistentVolumeClaim:
+        claimName: openvpn-pvc
