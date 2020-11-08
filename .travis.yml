@@ -23,13 +23,3 @@ jobs:
       after_success:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
         - docker push ${IMAGE} || travis_terminate 1;
-    - stage: 'Just build image for aarch64'
-      name: 'Build image'
-      before_script: cd images
-      env:
-        - IMAGE=tuimac/openvpn-aarch64
-      script:
-        - docker build -t ${IMAGE} -f Dockerfile-aarch64 . || travis_terminate 1;
-      after_success:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
-        - docker push ${IMAGE} || travis_terminate 1;
