@@ -15,6 +15,9 @@ function generateCert(){
     cd $EASYRSA
     ./easyrsa init-pki
     ./easyrsa --batch build-ca nopass
+    echo '######################################################'
+    echo '#      Start to generate diffie hellman key          #'
+    echo '######################################################'
     ./easyrsa gen-dh
     openvpn --genkey --secret ${EASYRSA}/pki/ta.key
     ./easyrsa build-server-full ${SERVERCERTNAME} nopass
@@ -26,6 +29,9 @@ function generateCert(){
     mv ${EASYRSA}/pki/dh.pem ${SERVERDIR}
     mv ${EASYRSA}/pki/issued/${CLIENTCERTNAME}.crt ${CLIENTDIR}
     mv ${EASYRSA}/pki/private/${CLIENTCERTNAME}.key ${CLIENTDIR}
+    echo '#######################################################'
+    echo '#  Finish to generate certification. please download. #'
+    echo '#######################################################'
 }
 
 function convertNetmask(){
