@@ -44,6 +44,9 @@ When you deploy on docker bridge network, execute command below.
 docker volume create openvpn
 docker run -itd -v openvpn:/etc/opnevpn -p 30001:1194/udp -v 30001:1194/tcp --cap-add NET_ADMIN --env-file env.list --network bridge tuimac/openvpn
 ```
+I created the small tool for the manipulation of docker is `run.sh`. 
+This script do building images, creating container, deleting container and image and so on.
+So if you want to customize this openvpn and debug, you can use that.
 
 When you deploy on kubernetes network with Flannel, you create manifest like [this][manifests] execute command below.
 ```
@@ -51,26 +54,16 @@ kubectl apply -f openvpn-volume.yaml
 kubectl apply -f openvpn-deployment.yaml
 ```
 
-### Access to server run OpenVPN container through HTTP.
-After `init.sh` create certifications, run download manager as http server. If you deploy this container on the server with 192.168.0.10, you can get certification <clinetname>.ovpn like this
+### Start to connect
+After `init.sh` create certifications, run download manager as http server. 
+If you deploy this container on the server with 192.168.0.10, 
+you can get certification `<clinetname>.ovpn` like this
 ```
 curl http://192.168.0.10:30000
 ```
-Once the download manager receive HTTP request, delete [clientname].ovpn file in the container and terminate the download manager itself. Sometimes or depends on your server spec, it takes times to generate diffie hellman key. If you couldn't download certification from the server, please check to do `docker logs <containername>`. 
+Once the download manager receive HTTP request, 
+delete `<clientname>.ovpn` file in the container and terminate the download manager itself.
+Sometimes or depends on your server spec, it takes times to generate diffie hellman key.
+If you couldn't download certification from the server, please check to do `docker logs <containername>`. 
 
-If the output is like below
-```
-git clone https://github.com/tuimac/openvpn.git
-```
-
-I created the small tool for the manipulation of docker is `run.sh`. 
-
-
-### Clone repository
-First things first, do `git clone`.
-```
-git clone https://github.com/tuimac/openvpn.git
-```
-### Change
-Then change directory to images/ and you can see two Dockerfiles. 
-You have to pick one Dockerfile is `Dockerfile-x64` or `Dockerfile-aarch64` depends on cpu architecture you want to run.
+If you don't have problem, you can connect to OpenVPN.
