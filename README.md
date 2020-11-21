@@ -1,6 +1,8 @@
 # OpenVPN on Docker
 [dockerhub-x64]: <https://hub.docker.com/r/tuimac/openvpn>
 [dockerhub-aarch64]: <https://hub.docker.com/r/tuimac/openvpn-aarch64>
+[env.list]: <https://github.com/tuimac/openvpn/blob/master/images/env.list>
+[manifests]: <https://github.com/tuimac/openvpn/tree/master/kubernetes>
 [![Build Status](https://travis-ci.com/tuimac/openvpn.svg?branch=master)](https://travis-ci.com/tuimac/openvpn)
 
 This OpenVPN can be deployed on any docker environment. 
@@ -30,7 +32,7 @@ All the env you need to change are below. Value section is just explanation.
 | TUNNELNETWORK | IP range of tunnel network between client and OpenVPN container.(server in server.conf) |
 | ROUTING[number] | IP range of private network you want to connect from client network.(push "route" in server.conf) |
 
-Example is [here][https://github.com/tuimac/openvpn/blob/master/images/env.list].
+Example is [here][env.list].
 
 ### Deployment
 I completed to deploy on docker bridge network and kubernetes network with Flannel.
@@ -43,7 +45,7 @@ docker volume create openvpn
 docker run -itd -v openvpn:/etc/opnevpn -p 30001:1194/udp -v 30001:1194/tcp --cap-add NET_ADMIN --env-file env.list --network bridge tuimac/openvpn
 ```
 
-When you deploy on kubernetes network with Flannel, you create manifest like [this][https://github.com/tuimac/openvpn/tree/master/kubernetes] execute command below.
+When you deploy on kubernetes network with Flannel, you create manifest like [this][manifests] execute command below.
 ```
 kubectl apply -f openvpn-volume.yaml
 kubectl apply -f openvpn-deployment.yaml
