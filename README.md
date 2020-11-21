@@ -80,7 +80,7 @@ I create Docker images for x86 and aarch64 environment below
 
 * **Kento Kashiwagi** - [tuimac](https://github.com/tuimac)
 
-If you have some opinion and find bugs, please post [here](https://github.com/tuimac/tagdns/issues).
+If you have some opinion and find bugs, please post [here](https://github.com/tuimac/openvpn/issues).
 
 ## License
 
