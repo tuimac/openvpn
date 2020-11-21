@@ -67,3 +67,27 @@ Sometimes or depends on your server spec, it takes times to generate diffie hell
 If you couldn't download certification from the server, please check to do `docker logs <containername>`. 
 
 If you don't have problem, you can connect to OpenVPN.
+
+## Docker images
+I create Docker images for x86 and aarch64 environment below
+
+| CPU architechture | URL |
+| ----- | ----- |
+| x86 | https://hub.docker.com/repository/docker/tuimac/openvpn |
+| aarch64 | https://hub.docker.com/repository/docker/tuimac/openvpn-aarch64 |
+
+## Authors
+
+* **Kento Kashiwagi** - [tuimac](https://github.com/tuimac)
+
+If you have some opinion and find bugs, please post [here](https://github.com/tuimac/tagdns/issues).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Plan
+
+- Try to deploy on ECS and Fargate cluster.
+- Implement management web console to manage User.
+- To test scaling architechture.
