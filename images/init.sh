@@ -121,7 +121,7 @@ log-append  /var/log/openvpn.log
 verb 4
 explicit-exit-notify 1
 EOF
-    convertNetmask $VIRTUALNETWORK
+    convertNetmask $TUNNELNETWORK
     echo 'server '${RESULT} >> $SERVERCONF
     env | grep -E 'ROUTING[[:digit:]]' | while read line; do
         local index=0
@@ -138,7 +138,7 @@ EOF
 function startVPN(){
     mkdir /dev/net
     mknod /dev/net/tun c 10 200
-    iptables -t nat -A POSTROUTING -s $VIRTUALNETWORK -o eth0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s $TUNNELNETWORK -o eth0 -j MASQUERADE
     env | grep -E 'ROUTING[[:digit:]]' | while read line; do
         local index=0
         for part in ${line//=/ }; do
