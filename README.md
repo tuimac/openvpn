@@ -49,6 +49,8 @@ This script do building images, creating container, deleting container and image
 So if you want to customize this openvpn and debug, you can use that.
 
 When you deploy on kubernetes network with Flannel, you create manifest like [this][manifests] execute command below.
+Before apply these, you need to create persistent volumes directory. For example in this manifest, you have to create
+by `mkdir -p /kubernetes/openvpn`.
 ```
 kubectl apply -f openvpn-volume.yaml
 kubectl apply -f openvpn-deployment.yaml

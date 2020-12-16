@@ -9,60 +9,69 @@ spec:
   ports:
     - name: pem
       protocol: TCP
-      nodePort: 30000
-      port: 30000
+      port: 1194
       targetPort: 1194
+      nodePort: 30000
     - name: openvpn
       protocol: UDP
-      nodePort: 30000
-      port: 30000
+      port: 1194
       targetPort: 1194
+      nodePort: 30000
   selector:
-    app: openvpn-pod
+    app: openvpn
 
 ---
 
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: openvpn
   labels:
-    app: openvpn-pod
+    app: openvpn
 spec:
-  containers:
-    - name: openvpn
-      image: tuimac/openvpn:latest
-      imagePullPolicy: IfNotPresent
-      securityContext:
-        capabilities:
-          add:
-            - "NET_ADMIN"
-      ports:
-        - name: pem
-          protocol: TCP
-          containerPort: 1194
+  replicas: 3
+  selector:
+    matchLabels:
+      app: openvpn
+  template:
+    metadata:
+      labels:
+        app: openvpn
+    spec:
+      containers:
         - name: openvpn
-          protocol: UDP
-          containerPort: 1194
-      env:
-        - name: CLIENTCERTNAME
-          value: 'tuimac'
-        - name: EXTERNALPORT
-          value: '30000'
-        - name: INTERNALPORT
-          value: '1194'
-        - name: PUBLICIP
-          value: 'vpn-public'
-        - name: VIRTUALNETWORK
-          value: '10.8.0.0/24'
-        - name: ROUTING1
-          value: '10.230.0.0/16'
-        - name: ROUTING2
-          value: '10.3.0.0/16'
-      volumeMounts:
-        - mountPath: /etc/openvpn/data
-          name: openvpn-persistent-volume
-  volumes:
-    - name: openvpn-persistent-volume
-      persistentVolumeClaim:
-        claimName: openvpn-pvc
+          image: tuimac/openvpn:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              add:
+                - "NET_ADMIN"
+          ports:
+            - name: pem
+              protocol: TCP
+              containerPort: 1194
+            - name: openvpn
+              protocol: UDP
+              containerPort: 1194
+          env:
+            - name: CLIENTCERTNAME
+              value: 'tuimac'
+            - name: EXTERNALPORT
+              value: '30000'
+            - name: INTERNALPORT
+              value: '1194'
+            - name: PUBLICIP
+              value: 'vpn-public'
+            - name: VIRTUALNETWORK
+              value: '10.8.0.0/24'
+            - name: ROUTING1
+              value: '10.230.0.0/16'
+            - name: ROUTING2
+              value: '10.3.0.0/16'
+          volumeMounts:
+            - mountPath: /etc/openvpn/data
+              name: openvpn-persistent-volume
+      volumes:
+        - name: openvpn-persistent-volume
+          persistentVolumeClaim:
+            claimName: openvpn-pvc
