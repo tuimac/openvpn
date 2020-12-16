@@ -149,7 +149,7 @@ function startVPN(){
             ((index++))
         done
     done
-    exec openvpn --config ${BASEDIR}/server.conf
+    exec openvpn --config ${SERVERCONF}
 }
 
 function main(){
