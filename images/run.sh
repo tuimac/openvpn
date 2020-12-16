@@ -3,7 +3,7 @@
 # Change variables below if you need
 ##############################
 NAME="openvpn"
-VOLUME="${PWD}/volume"
+VOLUME="openvpn"
 DOCKERHUBUSER=""
 CPUARCH="x64"
 ##############################
@@ -11,10 +11,9 @@ CPUARCH="x64"
 function runContainer(){
     docker volume create ${NAME}
     docker run -itd --name ${NAME} \
-        -v ${VOLUME}:/tmp \
-        -v ${NAME}:/etc/openvpn \
-        -p 30001:1194/udp \
-        -p 30001:1194/tcp \
+        -v ${VOLUME}:/etc/openvpn \
+        -p 30000:1194/udp \
+        -p 30000:1194/tcp \
         --cap-add NET_ADMIN \
         --env-file env.list \
         --network=bridge \
@@ -28,7 +27,6 @@ function cleanup(){
 }
 
 function createContainer(){
-    mkdir ${VOLUME}
     docker build -t ${NAME} -f Dockerfile-${CPUARCH} .
     runContainer
     cleanup
@@ -52,7 +50,6 @@ function deleteAll(){
     docker rmi ${NAME}
     docker volume rm ${NAME}
     cleanup
-    sudo rm -rf ${VOLUME}
 }
 
 function commitImage(){
