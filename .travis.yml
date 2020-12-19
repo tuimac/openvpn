@@ -7,12 +7,11 @@ env:
   global:
     - NAME=openvpn
     - PORT=30000
+    - IMAGE=tuimac/openvpn
 jobs:
   include:
     - stage: 'Test running container'
       before_script: cd builds
-      env:
-        - IMAGE=tuimac/openvpn
       script: docker build -t ${IMAGE} . || travis_terminate 1;
       name: 'Build docker image'
     - script: docker volume create ${NAME} || travis_terminate 1;
