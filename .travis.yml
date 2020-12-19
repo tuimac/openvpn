@@ -11,23 +11,19 @@ env:
     - CLIENTCERT=tuimac.ovpn
 jobs:
   include:
-    - stage: 'Test running container'
+    - stage: 'Build docker image'
       name: 'Build docker image'
       before_script: cd builds
-      script: docker build -t ${IMAGE} . || travis_terminate 1;
-    - name: 'Create docker volume'
-      script: docker volume create ${NAME} || travis_terminate 1;
-    - name: 'Create docker container'
+      script: 
+        - docker build -t ${IMAGE} . || travis_terminate 1;
+        - docker volume create ${NAME} || travis_terminate 1;
+        - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list -h ${NAME} --network=bridge ${IMAGE} || travis_terminate 1;
+        - for i in {0..10}; do curl http://localhost:${PORT}; sleep 3; done || travis_terminate 1;
+        - openvpn --config ${CLIENTCERT} || travis_terminate 1;
+    - stage: 'Push docker image'
+      name: 'Push docker image'
       before_script: cd builds
-      script: docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list -h ${NAME} --network=bridge ${IMAGE} || travis_terminate 1;
-    - name: 'Download test'
-      script: for i in {0..10}; do curl http://localhost:${PORT}; sleep 3; done || travis_terminate 1;
-    - name: 'Connection test'
-      script: openvpn --config ${CLIENTCERT} || travis_terminate 1;
-    - name: 'Prepare buildx'
-      script: curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | bash || travis_terminate 1;
-    - name: 'Docker login'
-      script: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
-    - name: 'Multi-platform build and push'
-      before_script: cd builds
-      script: docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push . || travis_terminate 1;
+      script:
+        - curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | bash || travis_terminate 1;
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
+        - docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push . || travis_terminate 1;
