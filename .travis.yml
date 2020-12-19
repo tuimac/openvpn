@@ -11,7 +11,7 @@ jobs:
   include:
     - stage: 'Run docker container for x64'
       name: 'Run openvpn container'
-      before_script: cd images
+      before_script: cd builds
       env:
         - IMAGE=tuimac/openvpn
       script:

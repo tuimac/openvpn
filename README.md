@@ -14,7 +14,7 @@ The way of deployment and operation is follow that.
 You can deploy a container to do `docker build` and `docker run` from my docker images ([x64][dockerhub-x64], [aarch64][dockerhub-aarch64]).
 This image don't have any certifications. 
 When you run docker container from those images, 
-entrypoint execute script `init.sh` to create certifications and run certifications download manager.
+entrypoint execute script `entrypoint.sh` to create certifications and run certifications download manager.
 These are the steps how to use after you deploy container from tuimac/openvpn.
 
 ## How to use
@@ -57,7 +57,7 @@ kubectl apply -f openvpn-deployment.yaml
 ```
 
 ### Start to connect
-After `init.sh` create certifications, run download manager as http server. 
+After `entrypoint.sh` create certifications, run download manager as http server. 
 If you deploy this container on the server with 192.168.0.10, 
 you can get certification `<clinetname>.ovpn` like this
 ```
