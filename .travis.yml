@@ -1,5 +1,5 @@
-language: minaml
-dist: trusty
+language: bash
+dist: focal
 sudo: required
 services:
   - docker
@@ -14,6 +14,7 @@ jobs:
     - stage: 'Install tools'
       name: 'Installation of Docker buildx'
       script:
+        - docker --version
         - git clone git://github.com/docker/buildx || travis_terminate 1;
         - cd buildx
         - make install || travis_terminate 1;
