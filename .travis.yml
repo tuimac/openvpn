@@ -13,8 +13,6 @@ jobs:
   include:
     - stage: 'Build docker image'
       name: 'Build docker image'
-      before_install:
-        - sudo apt-get install openvpn -y
       before_script: cd builds
       script: 
         - docker build -t ${IMAGE} . || travis_terminate 1;
@@ -26,7 +24,6 @@ jobs:
             [[ $? -eq 0 ]] && break;
             sleep 3;
           done || travis_terminate 1;
-        - openvpn --config ${CLIENTCERT} & || travis_terminate 1;
     - stage: 'Push docker image'
       name: 'Push docker image'
       before_script: cd builds
