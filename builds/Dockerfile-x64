@@ -3,7 +3,7 @@ FROM alpine:latest
 EXPOSE 1194/udp
 EXPOSE 1194/tcp
 
-ADD init.sh /etc/openvpn/init.sh
+ADD entrypoint.sh /etc/openvpn/entrypoint.sh
 ADD pem.py /etc/openvpn/pem.py
 
 RUN apk add openvpn bash easy-rsa python3 && \
