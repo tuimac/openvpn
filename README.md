@@ -71,12 +71,8 @@ If you couldn't download certification from the server, please check to do `dock
 If you don't have any problems, you can connect to OpenVPN.
 
 ## Docker images
-I create Docker images for x86 and aarch64 environment below
-
-| CPU architechture | URL |
-| ----- | ----- |
-| x86 | https://hub.docker.com/repository/docker/tuimac/openvpn |
-| aarch64 | https://hub.docker.com/repository/docker/tuimac/openvpn-aarch64 |
+I create Docker images for x86 and aarch64 environment [here](https://hub.docker.com/repository/docker/tuimac/openvpn).
+I do build image by buildx which is multi platform build tool.
 
 ## Authors
 
