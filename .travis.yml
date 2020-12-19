@@ -6,10 +6,25 @@ services:
 env:
   global:
     - NAME=openvpn
-    - PORT=30001
+    - PORT=30000
+    - DOCKER_BUILDKIT=1
+    - DOCKER_CLI_EXPERIMENTAL=enabled
 jobs:
   include:
-    - stage: 'Run docker container for x64'
+    - stage: 'Install tools'
+      name: 'Installation of Docker buildx'
+        - git clone git://github.com/docker/buildx || travis_terminate 1;
+        - cd buildx
+        - make install || travis_terminate 1;
+        - docker build --platform=local -o . git://github.com/docker/buildx || travis_terminate 1;
+        - mkdir -p ~/.docker/cli-plugins
+        - mv buildx ~/.docker/cli-plugins/docker-buildx
+        - docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3 || travis_terminate 1;
+        - cat /proc/sys/fs/binfmt_misc/qemu-aarch64 || travis_terminate 1;
+        - docker buildx create --name ${NAME} || travis_terminate 1;
+        - docker buildx use ${NAME} || travis_terminate 1;
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
+    - stage: 'Run docker container'
       name: 'Run openvpn container'
       before_script: cd builds
       env:
@@ -18,8 +33,8 @@ jobs:
         - docker build -t ${IMAGE} -f Dockerfile-x64 . || travis_terminate 1;
         - docker volume create ${NAME} || travis_terminate 1;
         - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list -h ${NAME} --network=bridge ${IMAGE} || travis_terminate 1;
-        - sleep 3 || travis_terminate 1;
+        - sleep 3
         - for i in {0..4}; do curl http://localhost:${PORT}; sleep 10; done || travis_terminate 1;
       after_success:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
-        - docker push ${IMAGE} || travis_terminate 1;
+        - docker rmi ${IMAGE} || travis_terminate 1;
+        - docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push . || travis_terminate 1;
