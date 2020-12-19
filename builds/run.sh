@@ -5,7 +5,6 @@
 NAME="openvpn"
 VOLUME="openvpn"
 DOCKERHUBUSER=""
-CPUARCH="x64"
 ##############################
 
 function runContainer(){
@@ -27,7 +26,7 @@ function cleanup(){
 }
 
 function createContainer(){
-    docker build -t ${NAME} -f Dockerfile-${CPUARCH} .
+    docker build -t ${NAME} .
     runContainer
     cleanup
 }
