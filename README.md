@@ -1,6 +1,4 @@
 # OpenVPN on Docker
-[dockerhub-x64]: <https://hub.docker.com/r/tuimac/openvpn>
-[dockerhub-aarch64]: <https://hub.docker.com/r/tuimac/openvpn-aarch64>
 [env.list]: <https://github.com/tuimac/openvpn/blob/master/images/env.list>
 [manifests]: <https://github.com/tuimac/openvpn/tree/master/kubernetes>
 [![Build Status](https://travis-ci.com/tuimac/openvpn.svg?branch=master)](https://travis-ci.com/tuimac/openvpn)
@@ -11,7 +9,7 @@ This OpenVPN container support only L3 Tunnel Network.
 The way of deployment and operation is to follow that.
 
 # Run as a single container on Docker Environment
-You can deploy a container to do `docker build` and `docker run` from my docker images ([x64][dockerhub-x64], [aarch64][dockerhub-aarch64]).
+You can deploy a container to do `docker build` and `docker run` from my docker images.
 This image doesn't have any certifications.
 When you run docker container from those images,
 entrypoint execute script `entrypoint.sh` to create certifications and run certifications download manager.
