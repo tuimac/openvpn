@@ -30,7 +30,7 @@ jobs:
         - docker run -itd --name test test
         - |
           sleep 3
-          docker ps -a
+          docker logs test
     - stage: 'Push docker image'
       name: 'Push docker image'
       before_script: cd builds
