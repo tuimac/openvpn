@@ -8,6 +8,7 @@ INITFLAG=${BASEDIR}'/.initflag'
 CLIENTDIR=${BASEDIR}'/cert/client/'${CLIENTCERTNAME}
 SERVERDIR=${BASEDIR}'/cert/server'
 SERVERCERTNAME=${RANDOM}
+DEVICE=eth0
 
 function generateCert(){
     mkdir -p ${SERVERDIR}
@@ -138,12 +139,12 @@ EOF
 function startVPN(){
     mkdir /dev/net
     mknod /dev/net/tun c 10 200
-    iptables -t nat -A POSTROUTING -s $TUNNELNETWORK -o eth0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s $TUNNELNETWORK -o $DEVICE -j MASQUERADE
     env | grep -E 'ROUTING[[:digit:]]' | while read line; do
         local index=0
         for part in ${line//=/ }; do
             if [ $index -eq 1 ]; then
-                iptables -t nat -A POSTROUTING -s $part -o eth0 -j MASQUERADE
+                iptables -t nat -A POSTROUTING -s $part -o $DEVICE -j MASQUERADE
                 break
             fi
             ((index++))
