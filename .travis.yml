@@ -25,12 +25,14 @@ jobs:
             [[ $? -eq 0 ]] && break;
             sleep 3;
           done || travis_terminate 1;
-        - mv ${CLIENTCERT} test.ovpn
-        - docker build -t test .
-        - docker run -itd --name test test
+        - mv ${CLIENTCERT} test.ovpn || travis_terminate 1;
+        - docker build -t test . || travis_terminate 1;
+        - docker run -itd --name test test || travis_terminate 1;
         - |
           sleep 3
-          docker logs test
+          for i in {0..10}; do
+            docker logs test || travis_terminate 1;
+          done
     - stage: 'Push docker image'
       name: 'Push docker image'
       before_script: cd builds
