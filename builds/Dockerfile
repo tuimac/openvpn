@@ -1,5 +1,7 @@
 FROM alpine:latest
 
+MAINTAINER tuimac
+
 EXPOSE 1194/udp
 EXPOSE 1194/tcp
 
