@@ -28,8 +28,8 @@ jobs:
         - mv ${CLIENTCERT} test.ovpn || travis_terminate 1;
         - docker build -t test . || travis_terminate 1;
         - docker run -itd --name test test || travis_terminate 1;
-        - sleep 3
-        - docker ps -a | grep Exited || travis_terminate 0;
+        - docker stop ${NAME} && docker start ${NAME} || travis_terminate 1;
+        - docker ps -a
     - stage: 'Push docker image'
       name: 'Push docker image'
       before_script: cd builds
