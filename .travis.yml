@@ -32,6 +32,7 @@ jobs:
           for i in {0..10}; do
             docker ps -a
             docker logs test || travis_terminate 1;
+            docker logs openvpn || travis_terminate 1;
             sleep 3
           done
     - stage: 'Push docker image'
