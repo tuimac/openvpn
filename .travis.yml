@@ -27,7 +27,7 @@ jobs:
           done || travis_terminate 1;
         - mv ${CLIENTCERT} test.ovpn
         - docker build -t test .
-        - docker run -itd --name test
+        - docker run -itd --name test sh
         - |
           sleep 3
           docker ps -a
