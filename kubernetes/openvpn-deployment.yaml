@@ -62,7 +62,7 @@ spec:
               value: '1194'
             - name: PUBLICIP
               value: 'vpn-public'
-            - name: VIRTUALNETWORK
+            - name: TUNNELNETWORK
               value: '10.8.0.0/24'
             - name: ROUTING1
               value: '10.230.0.0/16'
