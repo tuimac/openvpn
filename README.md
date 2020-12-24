@@ -40,7 +40,7 @@ Here is an example of deployment on x86 architecture environment.
 When you deploy on the docker bridge network, execute the command below.
 ```
 docker volume create openvpn
-docker run -itd -v openvpn:/etc/opnevpn -p 30001:1194/udp -v 30001:1194/tcp --cap-add NET_ADMIN --env-file env.list --network bridge tuimac/openvpn
+docker run -itd --name openvpn -v openvpn:/etc/opnevpn -p 30001:1194/udp -p 30001:1194/tcp --cap-add NET_ADMIN --env-file env.list --network bridge tuimac/openvpn
 ```
 I created the small tool for the manipulation of docker is `run.sh`.
 This script does building images, creating containers, deleting containers and images, and so on.
