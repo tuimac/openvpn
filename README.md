@@ -70,7 +70,7 @@ If you don't have any problems, you can connect to OpenVPN.
 
 ## Docker images
 I create Docker images for x86 and aarch64 environment [here](https://hub.docker.com/repository/docker/tuimac/openvpn).
-I do build image by buildx which is multi platform build tool.
+I do build image by buildx which is multi platform build tool.([buildx](https://github.com/docker/buildx))
 
 ## Authors
 
