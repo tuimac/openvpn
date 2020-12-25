@@ -32,8 +32,7 @@ jobs:
         - docker ps -a
     - stage: 'Push docker image'
       name: 'Push docker image'
-      before_install:
-        - sudo apt-get -y install qemu-user
+      if: branch = master
       before_script: cd builds
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
