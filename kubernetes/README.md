@@ -29,7 +29,7 @@ git clone https://github.com/tuimac/openvpn.git
 cd kubernetes
 ```
 
-When you deploy on the Kubernetes network with Flannel, you create a manifest like [this][manifests] execute the command below.
+When you deploy on the Kubernetes network with Flannel, you create a manifest like [this](https://github.com/tuimac/openvpn/blob/master/kubernetes/openvpn-deployment.yaml) to execute the command below.
 Before applying these, you need to create a persistent volumes directory. For example in this manifest, you have to create
 by `mkdir -p /kubernetes/openvpn`.
 ```
