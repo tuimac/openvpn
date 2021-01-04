@@ -31,6 +31,7 @@ jobs:
         - sleep 3
         - docker stop ${NAME} && docker start ${NAME} || travis_terminate 1;
         - docker ps -a
+        - sleep 3
         - docker logs test
     - stage: 'Push docker image'
       name: 'Push docker image'
@@ -38,8 +39,8 @@ jobs:
       before_script: cd builds
       script:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || travis_terminate 1;
-        - curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | bash || travis_terminate 1;
-        - docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push . || travis_terminate 1;
+        #- curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | bash || travis_terminate 1;
+        #- docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push . || travis_terminate 1;
     - stage: 'Deploy on Kubernetes'
       name: 'Deploy on Kubernetes'
       before_script: cd kubernetes
