@@ -31,7 +31,7 @@ jobs:
         - sleep 3
         - docker stop ${NAME} && docker start ${NAME} || travis_terminate 1;
         - docker ps -a
-        - docker log test
+        - docker logs test
     - stage: 'Push docker image'
       name: 'Push docker image'
       if: branch = master
@@ -51,9 +51,9 @@ jobs:
             PENDING=`kubectl get pods --all-namespaces --field-selector status.phase=Pending | wc -l`
             [[ $All -eq $PENDING ]] && { echo 'All OK'; break; }
             sleep 3
-          done
-        - mkdir -p /kubernetes/openvpn
-        - kubectl apply -f .
+          done || travis_terminate 1;
+        - mkdir -p /kubernetes/openvpn || travis_terminate 1;
+        - kubectl apply -f . || travis_terminate 1;
         - |
           ../test
           for i in {0..100}; do
