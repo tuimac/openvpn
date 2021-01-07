@@ -13,7 +13,7 @@ jobs:
       name: 'Build docker image'
       before_script: cd builds
       script: 
-        - curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install_docker.sh | bash
+        - curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-docker.sh | bash
         - docker build -t ${IMAGE} . || travis_terminate 1;
         - docker volume create ${NAME} || travis_terminate 1;
         - docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list --network=bridge ${IMAGE} || travis_terminate 1;
