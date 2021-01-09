@@ -32,6 +32,7 @@ jobs:
           name: Integration test - Connection
           working_directory: test
           command: |
+            set +x
             mv ${CLIENTCERT} test.ovpn
             docker build -t test .
             docker run -itd --name test --network bridge test
@@ -80,6 +81,7 @@ jobs:
           name: Integration test - Connection
           working_directory: test
           command: |
+            set +x
             mv ${CLIENTCERT} test.ovpn
             docker build -t test .
             docker run -itd --name test --network bridge test
