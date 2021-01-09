@@ -32,15 +32,16 @@ jobs:
           name: Integration test - Connection
           working_directory: test
           command: |
+            set +e
             mv ${CLIENTCERT} test.ovpn
             docker build -t test .
             docker run -itd --name test --network bridge test
             sleep 2
             docker stop ${NAME} && docker start ${NAME}
             sleep 2
-            docker ps -a
             docker logs test
-            [[ $(docker ps -a | grep Exited) != "" ]] && { exit 1; }
+            docker ps -a | grep Exit
+            [[ $? -eq 0 ]] && exit 1;
   push-image:
     machine: true
     steps:
