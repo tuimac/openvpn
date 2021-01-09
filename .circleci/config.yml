@@ -86,7 +86,7 @@ jobs:
             sleep 2
             docker stop ${NAME} && docker start ${NAME}
             sleep 2
-            [[ $(docker ps -a | grep -c Exited || true) -ne 0 ]] && exit 1;
+            docker ps -a | grep -c Exited || true
 workflows:
   version: 2.1
   openvpn-pipeline:
