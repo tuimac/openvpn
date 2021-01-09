@@ -7,6 +7,7 @@ jobs:
       - NAME: openvpn
       - PORT: 30000
       - CLIENTCERT: tuimac.ovpn
+      - BUILDX: https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
     steps:
       - checkout
       - run:
@@ -40,14 +41,22 @@ jobs:
             sleep 2
             docker logs test
   push-image:
-    machine: true
+    docker:
+      - image: docker:stable
     steps:
       - run:
-          name: Push Image
+          name: Login Docker Hub
+          command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run:
+          name: Download Buildx
+          command: curl --silent -L --output ~/.docker/cli-plugins/docker-buildx ${BUILDX}
+      - run:
+          name: Add permission to execute buildx
+          command: chmod a+x ~/.docker/cli-plugins/docker-buildx
+      - run:
+          name: Add permission to execute buildx
           working_directory: builds
-          command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | sudo bash
+          command: docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push .
   deploy-on-kubernetes:
     machine: true
     steps:
