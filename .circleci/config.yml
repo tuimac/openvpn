@@ -44,6 +44,7 @@ jobs:
       - image: docker:stable
     environment:
       - BUILDX: https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
+      - IMAGE: tuimac/openvpn
     steps:
       - checkout
       - setup_remote_docker:
