@@ -40,18 +40,16 @@ jobs:
             sleep 2
             docker logs test
   push-image:
-    docker:
-      - image: docker:stable
+    machine:
+      - image: ubuntu-2004:202010-01
     environment:
       - BUILDX: https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
       - IMAGE: tuimac/openvpn
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.13
       - run:
           name: Install tools
-          command: apk add make curl
+          command: sudo apt-get install docker-ce-cli binfmt-support qemu-user-static
       - run:
           name: Create directory for Docker Buildx plugin binary
           command: mkdir -vp ~/.docker/cli-plugins/
