@@ -46,7 +46,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          version: 20.10.0
+          version: 19.03.13
       - run:
           name: Install tools
           command: apk add make curl
