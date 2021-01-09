@@ -32,7 +32,6 @@ jobs:
           name: Integration test - Connection
           working_directory: test
           command: |
-            set +e
             mv ${CLIENTCERT} test.ovpn
             docker build -t test .
             docker run -itd --name test --network bridge test
@@ -41,7 +40,6 @@ jobs:
             sleep 2
             docker logs test
             docker ps -a | grep Exit
-            [[ $? -eq 0 ]] && exit 1;
   push-image:
     machine: true
     steps:
@@ -82,6 +80,7 @@ jobs:
           name: Integration test - Connection
           working_directory: test
           command: |
+            set +x
             mv ${CLIENTCERT} test.ovpn
             docker build -t test .
             docker run -itd --name test --network bridge test
@@ -89,7 +88,7 @@ jobs:
             docker stop ${NAME} && docker start ${NAME}
             sleep 2
             docker ps -a | grep Exit
-            [[ $? -eq 0 ]] && exit 1;
+            docker ps -a
 workflows:
   version: 2.1
   openvpn-pipeline:
