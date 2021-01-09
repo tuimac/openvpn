@@ -38,6 +38,8 @@ jobs:
             sleep 2
             docker stop ${NAME} && docker start ${NAME}
             sleep 2
+            docker ps -a
+            docker logs test
             docker ps -a | grep Exit
             [[ $? -eq 0 ]] && exit 1;
   push-image:
