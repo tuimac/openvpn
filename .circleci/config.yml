@@ -65,7 +65,12 @@ jobs:
           name: Add permission to execute buildx
           command: chmod a+x ~/.docker/cli-plugins/docker-buildx
       - run:
-          name: Add permission to execute buildx
+          name: Create docker driver
+          command: |
+            docker buildx create --name circleci
+            docker buildx use circleci
+      - run:
+          name: Build and Push docker image to Docker Hub
           working_directory: builds
           command: docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push .
   deploy-on-kubernetes:
