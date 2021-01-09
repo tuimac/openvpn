@@ -1,7 +1,7 @@
 # OpenVPN on Docker
 [env.list]: <https://github.com/tuimac/openvpn/blob/master/images/env.list>
 [manifests]: <https://github.com/tuimac/openvpn/tree/master/kubernetes>
-[![Build Status](https://travis-ci.com/tuimac/openvpn.svg?branch=master)](https://travis-ci.com/tuimac/openvpn)
+[![CircleCI](https://circleci.com/gh/tuimac/openvpn.svg?style=shield)](https://circleci.com/gh/tuimac/openvpn)
 
 This OpenVPN can be deployed on any docker environment.
 You can deploy on ECS, Fargate, Kubernetes, and so on.
