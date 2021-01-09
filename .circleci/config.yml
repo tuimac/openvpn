@@ -7,7 +7,6 @@ jobs:
       - NAME: openvpn
       - PORT: 30000
       - CLIENTCERT: tuimac.ovpn
-      - BUILDX: https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
     steps:
       - checkout
       - run:
@@ -43,6 +42,8 @@ jobs:
   push-image:
     docker:
       - image: docker:stable
+    environment:
+      - BUILDX: https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
     steps:
       - checkout
       - setup_remote_docker:
