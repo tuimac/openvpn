@@ -41,7 +41,7 @@ jobs:
             docker logs test
   push-image:
     machine:
-      - image: ubuntu-2004:202010-01
+      image: ubuntu-2004:202010-01
     environment:
       - BUILDX: https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
       - IMAGE: tuimac/openvpn
