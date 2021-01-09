@@ -70,13 +70,17 @@ jobs:
           working_directory: builds
           command: docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push .
   deploy-on-kubernetes:
-    machine: true
+    machine:
+      image: ubuntu-2004:202010-01
     steps:
       - run:
           name: Create Kubernetes cluster
           working_directory: kubernetes
+          command: curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/ubuntu-kube.sh | bash
+      - run:
+          name: Confirm Kubernetes cluster
+          working_directory: kubernetes
           command: |
-            curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/ubuntu-kube.sh | bash
             ALL=`kubectl get pods -A | wc -l`
             for i in {0..100}; do
               PENDING=`kubectl get pods --all-namespaces --field-selector status.phase=Pending | wc -l`
@@ -84,6 +88,10 @@ jobs:
               sleep 3
             done
             mkdir -p /kubernetes/openvpn
+      - run:
+          name: Deploy pods
+          working_directory: kubernetes
+          command: kubectl apply -f .
       - run:
           name: Integration test - Get first certification
           working_directory: test
@@ -95,6 +103,7 @@ jobs:
               sleep 3;
               [[ $i -eq 99 ]] && exit 1;
             done
+            sleep 5
       - run:
           name: Integration test - Connection
           working_directory: test
@@ -102,8 +111,6 @@ jobs:
             mv ${CLIENTCERT} test.ovpn
             docker build -t test .
             docker run -itd --name test --network bridge test
-            sleep 2
-            docker stop ${NAME} && docker start ${NAME}
             sleep 2
             docker logs test
 workflows:
