@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   test-image:
     machine: true
-    envirionment:
+    environment:
       - IMAGE: tuimac/openvpn
       - NAME: openvpn
       - PORT: 30000
