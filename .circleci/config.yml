@@ -47,7 +47,7 @@ jobs:
           working_directory: builds
           command: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | bash
+            curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | sudo bash
   deploy-on-kubernetes:
     machine: true
     steps:
