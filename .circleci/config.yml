@@ -48,9 +48,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install tools
-          command: sudo apt-get install -y docker-ce-cli binfmt-support qemu-user-static
-      - run:
           name: Create directory for Docker Buildx plugin binary
           command: mkdir -vp ~/.docker/cli-plugins/
       - run:
@@ -65,6 +62,7 @@ jobs:
       - run:
           name: Create docker driver
           command: |
+            docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
             docker buildx create --name circleci
             docker buildx use circleci
       - run:
