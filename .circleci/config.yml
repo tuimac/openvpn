@@ -80,15 +80,13 @@ jobs:
           name: Integration test - Connection
           working_directory: test
           command: |
-            set +x
             mv ${CLIENTCERT} test.ovpn
             docker build -t test .
             docker run -itd --name test --network bridge test
             sleep 2
             docker stop ${NAME} && docker start ${NAME}
             sleep 2
-            docker ps -a | grep Exit
-            docker ps -a
+            [[ $(docker ps -a | grep -c Exited || true) -ne 0 ]] && exit 1;
 workflows:
   version: 2.1
   openvpn-pipeline:
