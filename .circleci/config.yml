@@ -15,6 +15,7 @@ jobs:
           command: docker build -t ${IMAGE} .
       - run:
           name: Start containers
+          working_directory: builds
           command: docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list --network=bridge ${IMAGE}
       - run:
           name: Integration test - Get first certification
