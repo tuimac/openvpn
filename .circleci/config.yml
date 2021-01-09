@@ -1,0 +1,66 @@
+version: 2.1
+jobs:
+  test-image:
+    machine: true
+    envirionment:
+      - IMAGE: tuimac/openvpn
+      - NAME: openvpn
+      - PORT: 30000
+      - CLIENTCERT: tuimac.ovpn
+    steps:
+      - checkout
+      - run:
+          name: Build images
+          command: |
+            git clone https://github.com/tuimac/openvpn
+            cd builds
+            docker build -t ${IMAGE} .
+      - run:
+          name: Start containers
+          command: |
+            docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list --network=bridge ${IMAGE}
+      - run:
+          name: Integration test - Get first certification
+          working_directory: test
+          command: |
+            for i in {0..100}; do
+              curl http://localhost:${PORT} -o ${CLIENTCERT};
+              [[ $? -eq 0 ]] && break;
+              sleep 3;
+              [[ $i -eq 99 ]] && exit 1;
+            done
+      - run:
+          name: Integration test - Get first certification
+          working_directory: test
+          command: |
+            for i in {0..100}; do
+              curl http://localhost:${PORT} -o ${CLIENTCERT};
+              [[ $? -eq 0 ]] && break;
+              sleep 3;
+              [[ $i -eq 99 ]] && exit 1;
+            done
+  push-image:
+    machine: true
+    steps:
+      - 
+  deploy-on-kubernetes:
+    machine: true
+    steps:
+      - run:
+          name: Create Kubernetes cluster
+          command: |
+workflows:
+  version: 2.1
+  openvpn-pipeline:
+    jobs:
+      - test-image
+      - push-image:
+          requires:
+            - test-image
+          filters:
+            branches:
+              only: master
+      - deploy-on-kubernetes:
+          requires:
+            - push-image
+
