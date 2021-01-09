@@ -11,14 +11,11 @@ jobs:
       - checkout
       - run:
           name: Build images
-          command: |
-            git clone https://github.com/tuimac/openvpn
-            cd builds
-            docker build -t ${IMAGE} .
+          working_directory: builds
+          command: docker build -t ${IMAGE} .
       - run:
           name: Start containers
-          command: |
-            docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list --network=bridge ${IMAGE}
+          command: docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list --network=bridge ${IMAGE}
       - run:
           name: Integration test - Get first certification
           working_directory: test
@@ -30,25 +27,64 @@ jobs:
               [[ $i -eq 99 ]] && exit 1;
             done
       - run:
-          name: Integration test - Get first certification
+          name: Integration test - Connection
           working_directory: test
           command: |
-            for i in {0..100}; do
-              curl http://localhost:${PORT} -o ${CLIENTCERT};
-              [[ $? -eq 0 ]] && break;
-              sleep 3;
-              [[ $i -eq 99 ]] && exit 1;
-            done
+            mv ${CLIENTCERT} test.ovpn
+            docker build -t test .
+            docker run -itd --name test --network bridge test
+            sleep 2
+            docker stop ${NAME} && docker start ${NAME}
+            sleep 2
+            docker ps -a | grep Exit
+            [[ $? -eq 0 ]] && exit 1;
   push-image:
     machine: true
     steps:
-      - 
+      - run:
+          name: Push Image
+          working_directory: builds
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/install-buildx.sh | bash
+            docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push .
   deploy-on-kubernetes:
     machine: true
     steps:
       - run:
           name: Create Kubernetes cluster
+          working_directory: kubernetes
           command: |
+            curl https://raw.githubusercontent.com/tuimac/tools/master/cicd/scripts/ubuntu-kube.sh | bash
+            ALL=`kubectl get pods -A | wc -l`
+            for i in {0..100}; do
+              PENDING=`kubectl get pods --all-namespaces --field-selector status.phase=Pending | wc -l`
+              [[ $All -eq $PENDING ]] && { echo 'All OK'; break; }
+              sleep 3
+            done
+            mkdir -p /kubernetes/openvpn
+      - run:
+          name: Integration test - Get first certification
+          working_directory: test
+          command: |
+            for i in {0..100}; do
+              curl http://localhost:${PORT} -o ${CLIENTCERT};
+              [[ $? -eq 0 ]] && break;
+              sleep 3;
+              [[ $i -eq 99 ]] && exit 1;
+            done
+      - run:
+          name: Integration test - Connection
+          working_directory: test
+          command: |
+            mv ${CLIENTCERT} test.ovpn
+            docker build -t test .
+            docker run -itd --name test --network bridge test
+            sleep 2
+            docker stop ${NAME} && docker start ${NAME}
+            sleep 2
+            docker ps -a | grep Exit
+            [[ $? -eq 0 ]] && exit 1;
 workflows:
   version: 2.1
   openvpn-pipeline:
@@ -63,4 +99,3 @@ workflows:
       - deploy-on-kubernetes:
           requires:
             - push-image
-
