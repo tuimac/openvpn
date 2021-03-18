@@ -69,7 +69,8 @@ If you couldn't download certification from the server, please check to do `dock
 If you don't have any problems, you can connect to OpenVPN.
 
 ## OpenVPN High Availability Architechture
-If you use this image on the Kubernetes cluster or some other Docker Container cluster environment, you can provide high availability VPN environment. The picture below explains how to build high availability environment. Shared storage like NFS shares the core files which are configuration files and server certification files. Each pod within the Kubernetes cluster can get the information of that shared storage path if the persistent volume in the deployment manifest point to the host path is mounted by Shared storage.
+If you use this image on the Kubernetes cluster or some other Docker Container cluster environment, you can provide high availability VPN environment. <br>
+The picture below explains how to build high availability environment. Shared storage like NFS shares the core files which are configuration files and server certification files. Each pod within the Kubernetes cluster can get the information of that shared storage path if the persistent volume in the deployment manifest point to the host path is mounted by Shared storage.<br>
 But you have to consider Shared storage redundancy. If that storage weakens, that will be a single point of failure.
 
 ![openvpn-redundancy](https://user-images.githubusercontent.com/18078024/111646279-db1a0000-8844-11eb-8939-c446587a4ca1.png)
