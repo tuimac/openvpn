@@ -1,4 +1,4 @@
-# OpenVPN on Docker
+# OpenVPN on Docker Container
 [env.list]: <https://github.com/tuimac/openvpn/blob/master/builds/env.list>
 [manifests]: <https://github.com/tuimac/openvpn/tree/master/kubernetes>
 [![CircleCI](https://circleci.com/gh/tuimac/openvpn.svg?style=shield)](https://circleci.com/gh/tuimac/openvpn)
