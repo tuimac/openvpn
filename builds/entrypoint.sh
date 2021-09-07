@@ -139,8 +139,10 @@ EOF
 function startVPN(){
     mkdir /dev/net
     mknod /dev/net/tun c 10 200
+    ls /dev/net
     echo $TUNNELNETWORK
     echo $DEVICE
+    ip a
     iptables -t nat -A POSTROUTING -s $TUNNELNETWORK -o $DEVICE -j MASQUERADE
     env | grep -E 'ROUTING[[:digit:]]' | while read line; do
         local index=0
@@ -153,7 +155,7 @@ function startVPN(){
             ((index++))
         done
     done
-    exec openvpn --config ${SERVERCONF}
+    openvpn --config ${SERVERCONF}
 }
 
 function main(){
