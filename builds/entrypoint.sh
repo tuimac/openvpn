@@ -156,6 +156,7 @@ function startVPN(){
         done
     done
     openvpn --config ${SERVERCONF}
+    ip a
 }
 
 function main(){
