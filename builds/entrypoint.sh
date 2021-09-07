@@ -156,7 +156,6 @@ function startVPN(){
         done
     done
     openvpn --config ${SERVERCONF}
-    ip a
 }
 
 function main(){
@@ -176,6 +175,7 @@ function main(){
     else
         echo 'Starting OpenVPN process has been failed.'
     fi
+    ip a
 }
 
 main
