@@ -10,7 +10,7 @@ ADD pem.py /etc/openvpn/pem.py
 
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache openvpn bash easy-rsa python3 iptables && \
+    apk add --no-cache openvpn bash easy-rsa python3 iptables curl tcpdump tcptraceroute && \
     mkdir /etc/openvpn/data
 
 CMD ["bash", "/etc/openvpn/entrypoint.sh"]
