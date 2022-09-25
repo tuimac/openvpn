@@ -70,7 +70,7 @@ user nobody
 group nobody
 remote-cert-tls server
 tls-client
-comp-lzo
+comp-lzo yes
 cipher AES-256-CBC
 verb 4
 tun-mtu 1500
@@ -110,7 +110,7 @@ dh ${SERVERDIR}/dh.pem
 keepalive 10 120
 tls-auth ${SERVERDIR}/ta.key 0
 cipher AES-256-CBC
-comp-lzo
+compress lzo
 max-clients 1
 user nobody
 group nobody
