@@ -24,14 +24,16 @@ function generateCert(){
     expect -c "
     set timeout 5
     spawn ./easyrsa build-server-full $SERVERCERTNAME nopass
-    expect "Confirm request details:"
+    expect \"Confirm request details:\"
     send \"yes\n\"
+    expect eof
     "
     expect -c "
     set timeout 5
     spawn ./easyrsa build-client-full $CLIENTCERTNAME nopass
-    expect "Confirm request details:"
+    expect \"Confirm request details:\"
     send \"yes\n\"
+    expect eof
     "
     mv ${EASYRSA}/pki/ca.crt ${SERVERDIR}
     mv ${EASYRSA}/pki/issued/${SERVERCERTNAME}.crt ${SERVERDIR}
