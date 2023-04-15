@@ -16,7 +16,7 @@ jobs:
           command: docker build -t ${IMAGE_NAME} .
       - run:
           name: Start containers
-          working_directory: builds
+          working_directory: docker/prod
           command: |
             docker run -itd --name ${CONTAINER_NAME} -v ${CONTAINER_NAME}:/etc/openvpn -p ${CONTAINER_PORT}:1194/udp -p ${CONTAINER_PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${CONTAINER_IMAGE}
       - run:
