@@ -18,13 +18,7 @@ jobs:
           name: Start containers
           working_directory: builds
           command: |
-            docker run -itd --name ${CONTAINER_NAME} \
-              -v ${CONTAINER_NAME}:/etc/openvpn \
-              -p ${CONTAINER_PORT}:1194/udp \
-              -p ${CONTAINER_PORT}:1194/tcp \
-              --cap-add NET_ADMIN \
-              --env-file env.list \
-              ${CONTAINER_IMAGE}
+            docker run -itd --name ${CONTAINER_NAME} -v ${CONTAINER_NAME}:/etc/openvpn -p ${CONTAINER_PORT}:1194/udp -p ${CONTAINER_PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${CONTAINER_IMAGE}
       - run:
           name: Integration test - Get first certification
           working_directory: test
@@ -68,10 +62,7 @@ jobs:
           name: Build and Push docker image
           working_directory: docker/prod
           command: |
-            docker buildx build \
-              --push \
-              --platform linux/ppc64le,linux/s390x,linux/arm64,linux/amd64 \
-              -t ${IMAGE_NAME} .
+            docker buildx build --push --platform linux/ppc64le,linux/s390x,linux/arm64,linux/amd64 -t ${IMAGE_NAME} .
 workflows:
   version: 2.1
   openvpn:
