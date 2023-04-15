@@ -1,29 +1,37 @@
 version: 2.1
 jobs:
-  test-image:
-    machine: true
+  BuildAndTest:
+    machine:
+      image: ubuntu-2204:current
     environment:
-      - IMAGE: tuimac/openvpn
-      - NAME: openvpn
-      - PORT: 30000
+      - IMAGE_NAME: tuimac/openvpn
+      - CONTAINER_NAME: openvpn
+      - CONTAINER_PORT: 30000
       - CLIENTCERT: tuimac.ovpn
     steps:
       - checkout
       - run:
           name: Build images
-          working_directory: builds
-          command: docker build -t ${IMAGE} .
+          working_directory: docker
+          command: docker build -t ${IMAGE_NAME} .
       - run:
           name: Start containers
           working_directory: builds
-          command: docker run -itd --name ${NAME} -v ${NAME}:/etc/openvpn -p ${PORT}:1194/udp -p ${PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list --network=bridge ${IMAGE}
+          command: |
+            docker run -itd --name ${CONTAINER_NAME} \
+              -v ${CONTAINER_NAME}:/etc/openvpn \
+              -p ${CONTAINER_PORT}:1194/udp \
+              -p ${CONTAINER_PORT}:1194/tcp \
+              --cap-add NET_ADMIN \
+              --env-file env.list \
+              ${CONTAINER_IMAGE}
       - run:
           name: Integration test - Get first certification
           working_directory: test
           command: |
             set +e
             for i in {0..100}; do
-              curl http://localhost:${PORT} -o ${CLIENTCERT};
+              curl http://localhost:${CONTAINER_PORT} -o ${CLIENTCERT};
               [[ $? -eq 0 ]] && break;
               sleep 3;
               [[ $i -eq 99 ]] && exit 1;
@@ -36,47 +44,41 @@ jobs:
             docker build -t test .
             docker run -itd --name test --network bridge test
             sleep 2
-            docker stop ${NAME} && docker start ${NAME}
+            docker stop ${CONTAINER_NAME} && docker start ${CONTAINER_NAME}
             sleep 2
             docker logs test
-  push-image:
+ push_image:
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2204:current
     environment:
-      - BUILDX: https://github.com/docker/buildx/releases/download/v0.5.1/buildx-v0.5.1.linux-amd64
-      - IMAGE: tuimac/openvpn
+      - IMAGE_NAME: 'tuimac/openvpn'
+      - DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
       - checkout
-      - run:
-          name: Create directory for Docker Buildx plugin binary
-          command: mkdir -vp ~/.docker/cli-plugins/
       - run:
           name: Login Docker Hub
           command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - run:
-          name: Download Buildx
-          command: curl --silent -L --output ~/.docker/cli-plugins/docker-buildx ${BUILDX}
-      - run:
-          name: Add permission to execute buildx
-          command: chmod a+x ~/.docker/cli-plugins/docker-buildx
-      - run:
-          name: Create docker driver
+          name: Setup Docker Buildx
           command: |
-            docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
-            docker buildx create --name circleci
-            docker buildx use circleci
+            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+            docker context create circleci
+            docker buildx create --use circleci
       - run:
-          name: Build and Push docker image to Docker Hub
-          working_directory: builds
-          command: docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push .
+          name: Build and Push docker image
+          command: |
+            docker buildx build \
+              --push \
+              --platform linux/ppc64le,linux/s390x,linux/arm64,linux/amd64 \
+              -t ${IMAGE_NAME} .
 workflows:
   version: 2.1
   openvpn-pipeline:
     jobs:
-      - test-image
-      - push-image:
+      - BuildAndTest
+      - PushImage:
           requires:
-            - test-image
+            - BuildAndTest
           filters:
             branches:
-              only: master
+              only: main
