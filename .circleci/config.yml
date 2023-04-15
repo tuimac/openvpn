@@ -12,7 +12,7 @@ jobs:
       - checkout
       - run:
           name: Build images
-          working_directory: docker
+          working_directory: docker/pord
           command: docker build -t ${IMAGE_NAME} .
       - run:
           name: Start containers
@@ -66,6 +66,7 @@ jobs:
             docker buildx create --use circleci
       - run:
           name: Build and Push docker image
+          working_directory: docker/prod
           command: |
             docker buildx build \
               --push \
