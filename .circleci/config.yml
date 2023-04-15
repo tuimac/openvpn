@@ -12,7 +12,7 @@ jobs:
       - checkout
       - run:
           name: Build images
-          working_directory: docker/pord
+          working_directory: docker/prod
           command: docker build -t ${IMAGE_NAME} .
       - run:
           name: Start containers
