@@ -47,7 +47,7 @@ jobs:
             docker stop ${CONTAINER_NAME} && docker start ${CONTAINER_NAME}
             sleep 2
             docker logs test
-  push_image:
+  PushImage:
     machine:
       image: ubuntu-2204:current
     environment:
@@ -74,7 +74,7 @@ jobs:
               -t ${IMAGE_NAME} .
 workflows:
   version: 2.1
-  openvpn-pipeline:
+  openvpn:
     jobs:
       - BuildAndTest
       - PushImage:
