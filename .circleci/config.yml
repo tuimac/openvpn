@@ -18,7 +18,7 @@ jobs:
           name: Start containers
           working_directory: docker/prod
           command: |
-            docker run -itd --name ${CONTAINER_NAME} -v ${CONTAINER_NAME}:/etc/openvpn -p ${CONTAINER_PORT}:1194/udp -p ${CONTAINER_PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${CONTAINER_IMAGE}
+            docker run -itd --name ${CONTAINER_NAME} -v ${CONTAINER_NAME}:/etc/openvpn -p ${CONTAINER_PORT}:1194/udp -p ${CONTAINER_PORT}:1194/tcp --cap-add NET_ADMIN --env-file env.list ${IMAGE_NAME}
       - run:
           name: Integration test - Get first certification
           working_directory: test
